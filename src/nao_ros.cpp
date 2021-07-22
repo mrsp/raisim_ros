@@ -15,7 +15,6 @@
 #include <vector>
 #include <chrono>
 #include <raisim_ros/raisim_tools.h>
-using namespace std::chrono;
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
@@ -24,6 +23,8 @@ using namespace std::chrono;
 #include "geometry_msgs/WrenchStamped.h"
 #include "geometry_msgs/PointStamped.h"
 
+
+using namespace std::chrono;
 using namespace Eigen;
 //Simulation Step, 0.01 is the hardware loop of the actual NAO
 double dt = 0.01;
@@ -58,7 +59,7 @@ void commandJointStatesCallback(const sensor_msgs::JointState::ConstPtr& msg)
 int main(int argc, char *argv[])
 {
   auto binaryPath = raisim::Path::setFromArgv(argv[0]);
-  raisim::World::setActivationKey("/home/atom/raisim_workspace/raisim_examples/rsc/activation.raisim");
+  raisim::World::setActivationKey("/home/master/raisim_workspace/raisim_examples/rsc/activation.raisim");
 #if WIN32
   timeBeginPeriod(1); // for sleep_for function. windows default clock speed is 1/64 second. This sets it to 1ms.
 #endif
@@ -71,7 +72,7 @@ int main(int argc, char *argv[])
 
   /// create objects
   auto ground = world.addGround();
-  auto NAO = world.addArticulatedSystem("/home/atom/raisim_workspace/raisim_examples/rsc/nao/nao.urdf");
+  auto NAO = world.addArticulatedSystem("/home/master/raisim_workspace/raisim_examples/rsc/nao/nao.urdf");
 
   ///Remove ROOT + universe joints names from the joint name vector get only the actuated joints
   std::vector<std::string> jnames = NAO->getMovableJointNames();
@@ -165,6 +166,7 @@ int main(int argc, char *argv[])
   Eigen::Matrix3d RfootOrientation;
   Eigen::Vector3d LfootPosition;
   Eigen::Matrix3d LfootOrientation;
+  Quaterniond qir, qil;
   Vector3d COPL, COPR, ZMP;
 
 
@@ -185,10 +187,10 @@ int main(int argc, char *argv[])
   ros::Publisher wrench_pub_RLeg = n.advertise<geometry_msgs::WrenchStamped>("/nao_raisim_ros/RLeg/force_torque_states", 1000);
   ros::Publisher gait_phase_pub = n.advertise<std_msgs::String>("/nao_raisim_ros/gait_phase", 1000);
   ros::Publisher com_pub = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/CoM", 1000);
+  ros::Publisher odom_pub_LLeg = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/LLeg/odom", 1000);
+  ros::Publisher odom_pub_RLeg = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/RLeg/odom", 1000);
   ros::Publisher zmp_pub = n.advertise<geometry_msgs::PointStamped>("/nao_raisim_ros/ZMP", 1000);
-
   ros::Subscriber command_js_sub = n.subscribe("/nao_raisim_ros/command_joint_states", 1000, commandJointStatesCallback);
-
   ros::Rate loop_rate(100);
 
   while (ros::ok())
@@ -208,6 +210,8 @@ int main(int argc, char *argv[])
 
       Tir.translation() = RfootPosition;
       Tir.linear() = RfootOrientation;
+      qir = Quaterniond(RfootOrientation);
+
       NAO->getFramePosition(LfootFrameIndex, footPosition);
       NAO->getFrameOrientation(LfootFrameIndex, footOrientation);
       LfootPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
@@ -216,6 +220,8 @@ int main(int argc, char *argv[])
       LfootOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
       Til.translation() = LfootPosition;
       Til.linear() = LfootOrientation;
+      qil = Quaterniond(LfootOrientation);
+
       //std::cout<<"Left Foot Pos"<< LfootOrientation<<std::endl;
 
       RLegGRT.setZero();
@@ -346,6 +352,49 @@ int main(int argc, char *argv[])
     odom_msg.header.stamp = ros::Time::now();
 
     odom_pub.publish(odom_msg);
+
+    //RLeg Odom Publisher
+    nav_msgs::Odometry rodom_msg;
+
+    rodom_msg.pose.pose.position.x = RfootPosition(0);
+    rodom_msg.pose.pose.position.y = RfootPosition(1);
+    rodom_msg.pose.pose.position.z = RfootPosition(2);
+    rodom_msg.pose.pose.orientation.x = qir.x();
+    rodom_msg.pose.pose.orientation.y = qir.y();
+    rodom_msg.pose.pose.orientation.z = qir.z();
+    rodom_msg.pose.pose.orientation.w = qir.w();
+
+
+
+    rodom_msg.header.frame_id = "world";
+    rodom_msg.child_frame_id = "r_sole";
+
+    rodom_msg.header.stamp = ros::Time::now();
+
+    odom_pub_RLeg.publish(rodom_msg);
+
+    //LLeg Odom Publisher
+    nav_msgs::Odometry lodom_msg;
+
+    lodom_msg.pose.pose.position.x = LfootPosition(0);
+    lodom_msg.pose.pose.position.y = LfootPosition(1);
+    lodom_msg.pose.pose.position.z = LfootPosition(2);
+    lodom_msg.pose.pose.orientation.x = qil.x();
+    lodom_msg.pose.pose.orientation.y = qil.y();
+    lodom_msg.pose.pose.orientation.z = qil.z();
+    lodom_msg.pose.pose.orientation.w = qil.w();
+
+
+
+    lodom_msg.header.frame_id = "world";
+    lodom_msg.child_frame_id = "l_sole";
+
+    lodom_msg.header.stamp = ros::Time::now();
+
+    odom_pub_LLeg.publish(lodom_msg);
+
+
+
 
 
     // FORCE TORQUE PUBLISHER
