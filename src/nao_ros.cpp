@@ -1,11 +1,5 @@
-// This file is part of RaiSim. You must obtain a valid license from RaiSim Tech
-// Inc. prior to usage.
-
 #include "raisim/RaisimServer.hpp"
 #include "raisim/World.hpp"
-#if WIN32
-#include <timeapi.h>
-#endif
 #include <Eigen/Dense>
 #include <fstream>
 #include <iostream>
@@ -13,7 +7,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <chrono>
 #include <raisim_ros/raisim_tools.h>
 
 #include "ros/ros.h"
@@ -24,7 +17,6 @@
 #include "geometry_msgs/PointStamped.h"
 #include "raisim_ros/Queue.h"
 
-using namespace std::chrono;
 using namespace Eigen;
 //Simulation Step, 0.01 is the hardware loop of the actual NAO
 double dt = 0.01;
@@ -41,21 +33,34 @@ void commandJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
 
 int main(int argc, char *argv[])
 {
-  auto binaryPath = raisim::Path::setFromArgv(argv[0]);
-  raisim::World::setActivationKey("/home/master/raisim_workspace/raisim_examples/rsc/activation.raisim");
-#if WIN32
-  timeBeginPeriod(1); // for sleep_for function. windows default clock speed is 1/64 second. This sets it to 1ms.
-#endif
+  ros::init(argc, argv, "nao_ros_publisher");
+  ros::NodeHandle n;
+  ros::NodeHandle n_p("~");
 
-  /// create raisim world
+  string modelname, activation_key;
+  bool enable_gravity, animation_mode;
+  double jointPgain_, jointDgain_;
+
+  n_p.param<std::string>("modelname",modelname,"/home/master/catkin_ws/src/raisim_ros/rsc/nao/nao.urdf");
+  n_p.param<std::string>("activation_key",activation_key,"/home/master/raisim_workspace/raisim_examples/rsc/activation.raisim");
+  n_p.param<bool>("enable_gravity",enable_gravity,true);
+  n_p.param<bool>("animation_mode",animation_mode,false);
+
+  n_p.param<double>("jointPgain", jointPgain_, 350);
+  n_p.param<double>("jointDgain", jointDgain_, 5);
+
+  raisim::World::setActivationKey(activation_key);
+  ///create raisim world
   raisim::World world;
   world.setTimeStep(dt);
   world.setERP(0, 0);
-  //world.setGravity(Eigen::Vector3d(0,0,0));
 
-  /// create objects
+  if (!enable_gravity)
+    world.setGravity(Eigen::Vector3d(0, 0, 0));
+
+  ///create objects
   auto ground = world.addGround();
-  auto NAO = world.addArticulatedSystem("/home/master/raisim_workspace/raisim_examples/rsc/nao/nao.urdf");
+  auto NAO = world.addArticulatedSystem(modelname.c_str());
 
   ///Remove ROOT + universe joints names from the joint name vector get only the actuated joints
   std::vector<std::string> jnames = NAO->getMovableJointNames();
@@ -87,8 +92,8 @@ int main(int argc, char *argv[])
 
   ///Set Joint PD Gains
   Eigen::VectorXd jointPgain(NAO->getDOF()), jointDgain(NAO->getDOF());
-  jointPgain.setConstant(350);
-  jointDgain.setConstant(5); //Gazebo D gain is 0.1 but makes NAO unstable in raisim
+  jointPgain.setConstant(jointPgain_);
+  jointDgain.setConstant(jointDgain_); //Gazebo D gain is 0.1 but makes NAO unstable in raisim
 
   ///Set the Initial Configuration in the world
   NAO->setGeneralizedCoordinate(jointNominalConfig);
@@ -111,46 +116,32 @@ int main(int argc, char *argv[])
   string base_frame = "base_link";
   string lhand_frame = "LHand";
   string rhand_frame = "RHand";
-  string head_frame = "Head";
-
-  Vector3d CoM_pos_ref, CoM_vel_ref, CoM_acc_ref, CoM_vel_ref_, lhand_pos_ref, rhand_pos_ref, lhand_linear_vel_ref, rhand_linear_vel_ref, head_pos_ref, head_linear_vel_ref,
-      lf_pos_ref, rf_pos_ref, lf_linear_vel_ref, rf_linear_vel_ref, lf_angular_vel_ref, rf_angular_vel_ref, base_pos_ref, base_linear_vel_ref, base_angular_vel_ref,
-      lhand_angular_vel_ref, rhand_angular_vel_ref, head_angular_vel_ref;
-  Vector3d CoM_pos, CoM_vel, CoM_vel_, CoM_acc;
-  Quaterniond lf_orientation_ref, rf_orientation_ref, base_orientation_ref, head_orientation_ref, lhand_orientation_ref, rhand_orientation_ref;
-  VectorXd joint_states_ref;
+  string head_frame = "HeadYaw";
 
   double mass = NAO->getTotalMass();
-  // set PD TODO
-
-  int init_idx = 0;
   bool LSS, RSS, DS;
   bool firstCoMVel = true;
 
   /// For Contact Detection, COP, GRF and GRT computation
   auto RfootIndex = NAO->getBodyIdx("r_ankle");
   auto LfootIndex = NAO->getBodyIdx("l_ankle");
+
   auto RfootFrameIndex = NAO->getFrameIdxByName("RLeg_effector_fixedjoint");
   auto LfootFrameIndex = NAO->getFrameIdxByName("LLeg_effector_fixedjoint");
+  auto RHandFrameIndex = NAO->getFrameIdxByName(rhand_frame);
+  auto LHandFrameIndex = NAO->getFrameIdxByName(lhand_frame);
+  auto HeadFrameIndex = NAO->getFrameIdxByName(head_frame);
+
   Eigen::Vector3d RLegGRF, RLegGRT, LLegGRF, LLegGRT, footForce, footTorque, LLeg_COP, RLeg_COP;
   raisim::Vec<3> footPosition;
   raisim::Mat<3, 3> footOrientation;
-  Affine3d Tir, Til;
-  Eigen::Vector3d RfootPosition;
-  Eigen::Matrix3d RfootOrientation;
-  Eigen::Vector3d LfootPosition;
-  Eigen::Matrix3d LfootOrientation;
-  Quaterniond qir, qil;
-  Vector3d COPL, COPR, ZMP;
-
-  double dist_t = 0;
-  int idx = 0;
-  int start_idx = 500;
+  Affine3d Tir, Til, TiLH, TiRH, TiH;
+  Eigen::Vector3d RfootPosition, LfootPosition, HeadPosition, RHandPosition, LHandPosition;
+  Eigen::Matrix3d RfootOrientation, LfootOrientation, RHandOrientation, LHandOrientation, HeadOrientation;
+  Quaterniond qir, qil, qiLH, qiRH, qiH;
+  Vector3d COPL, COPR, ZMP, CoM_pos, CoM_vel;
 
   // INIT ROS PUBLISHER
-
-  ros::init(argc, argv, "nao_ros_publisher");
-  ros::NodeHandle n;
 
   ros::Publisher joint_pub = n.advertise<sensor_msgs::JointState>("/nao_raisim_ros/joint_states", 1000);
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/odom", 1000);
@@ -160,15 +151,52 @@ int main(int argc, char *argv[])
   ros::Publisher com_pub = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/CoM", 1000);
   ros::Publisher odom_pub_LLeg = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/LLeg/odom", 1000);
   ros::Publisher odom_pub_RLeg = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/RLeg/odom", 1000);
+  ros::Publisher odom_pub_LHand = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/LHand/odom", 1000);
+  ros::Publisher odom_pub_RHand = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/RHand/odom", 1000);
+  ros::Publisher odom_pub_Head = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/Head/odom", 1000);
   ros::Publisher zmp_pub = n.advertise<geometry_msgs::PointStamped>("/nao_raisim_ros/ZMP", 1000);
+  ros::Publisher LCOP_pub = n.advertise<geometry_msgs::PointStamped>("/nao_raisim_ros/LLeg/COP", 1000);
+  ros::Publisher RCOP_pub = n.advertise<geometry_msgs::PointStamped>("/nao_raisim_ros/RLeg/COP", 1000);
   ros::Subscriber command_js_sub = n.subscribe("/nao_raisim_ros/command_joint_states", 1000, commandJointStatesCallback);
+
+  sensor_msgs::JointState joint_msg;
+  joint_msg.name.resize(jnames.size());
+  joint_msg.name = jnames;
+  nav_msgs::Odometry odom_msg;
+  odom_msg.header.frame_id = "world";
+  odom_msg.child_frame_id = "base_link";
+  nav_msgs::Odometry rodom_msg;
+  rodom_msg.header.frame_id = "world";
+  rodom_msg.child_frame_id = "r_sole";
+  nav_msgs::Odometry lodom_msg;
+  lodom_msg.header.frame_id = "world";
+  lodom_msg.child_frame_id = "l_sole";
+  nav_msgs::Odometry RHodom_msg;
+  RHodom_msg.header.frame_id = "world";
+  RHodom_msg.child_frame_id = "RHand";
+  nav_msgs::Odometry LHodom_msg;
+  LHodom_msg.header.frame_id = "world";
+  LHodom_msg.child_frame_id = "LHand";
+  nav_msgs::Odometry Hodom_msg;
+  Hodom_msg.header.frame_id = "world";
+  Hodom_msg.child_frame_id = "Head";
+  geometry_msgs::WrenchStamped wrench_msg;
+  wrench_msg.header.frame_id = "world";
+
+  std_msgs::String gait_msg;
+  nav_msgs::Odometry com_msg;
+  com_msg.header.frame_id = "world";
+  com_msg.child_frame_id = "CoM";
+  geometry_msgs::PointStamped zmp_msg;
+  zmp_msg.header.frame_id = "world";
+  geometry_msgs::PointStamped lcop_msg, rcop_msg;
+  lcop_msg.header.frame_id = "world";
+  rcop_msg.header.frame_id = "world";
+
   ros::Rate loop_rate(120);
 
   while (ros::ok())
   {
-
-    auto start = high_resolution_clock::now();
-
     NAO->getState(q, dq);
 
     /// Get Leg Positions in raisim
@@ -176,7 +204,6 @@ int main(int argc, char *argv[])
     NAO->getFrameOrientation(RfootFrameIndex, footOrientation);
     RfootPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
     RfootOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
-    //std::cout<<"Right Foot Pos"<< RfootPosition.transpose()<<std::endl;
 
     Tir.translation() = RfootPosition;
     Tir.linear() = RfootOrientation;
@@ -185,14 +212,40 @@ int main(int argc, char *argv[])
     NAO->getFramePosition(LfootFrameIndex, footPosition);
     NAO->getFrameOrientation(LfootFrameIndex, footOrientation);
     LfootPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
-    //std::cout<<"Left Foot Pos"<< LfootPosition.transpose()<<std::endl;
 
     LfootOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
     Til.translation() = LfootPosition;
     Til.linear() = LfootOrientation;
     qil = Quaterniond(LfootOrientation);
 
-    //std::cout<<"Left Foot Pos"<< LfootOrientation<<std::endl;
+    /// Get Hand Positions in raisim
+    NAO->getFramePosition(RHandFrameIndex, footPosition);
+    NAO->getFrameOrientation(RHandFrameIndex, footOrientation);
+    RHandPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
+    RHandOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
+
+    TiRH.translation() = RHandPosition;
+    TiRH.linear() = RHandOrientation;
+    qiRH = Quaterniond(RHandOrientation);
+
+    NAO->getFramePosition(LHandFrameIndex, footPosition);
+    NAO->getFrameOrientation(LHandFrameIndex, footOrientation);
+    LHandPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
+    LHandOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
+
+    TiLH.translation() = LHandPosition;
+    TiLH.linear() = LHandOrientation;
+    qiLH = Quaterniond(LHandOrientation);
+
+    //Get Head Position
+    NAO->getFramePosition(HeadFrameIndex, footPosition);
+    NAO->getFrameOrientation(HeadFrameIndex, footOrientation);
+    HeadPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
+    HeadOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
+
+    TiH.translation() = HeadPosition;
+    TiH.linear() = HeadOrientation;
+    qiH = Quaterniond(HeadOrientation);
 
     RLegGRT.setZero();
     LLegGRT.setZero();
@@ -268,7 +321,7 @@ int main(int argc, char *argv[])
     CoM_vel = Vector3d(linear_momentum(0), linear_momentum(1), linear_momentum(2)) / mass;
     CoM_pos = Vector3d(center_of_mass(0), center_of_mass(1), center_of_mass(2));
 
-    cout << "Buffer Size " << joint_data.size() << endl;
+    //cout << "Buffer Size " << joint_data.size() << endl;
 
     if (joint_data.size() > 0)
     {
@@ -281,35 +334,28 @@ int main(int argc, char *argv[])
       double *vel_array = vel_vector.data();
       jointNominalVelocity = Eigen::Map<Eigen::Matrix<double, 32, 1>>(vel_array);
     }
-    NAO->setPdTarget(jointNominalConfig, jointNominalVelocity);
-
-    //NAO->setGeneralizedCoordinate(jointNominalConfig);
-    //NAO->setGeneralizedVelocity(jointNominalVelocity);
+    if (animation_mode)
+    {
+      NAO->setGeneralizedCoordinate(jointNominalConfig);
+      NAO->setGeneralizedVelocity(jointNominalVelocity);
+    }
+    else
+      NAO->setPdTarget(jointNominalConfig, jointNominalVelocity);
 
     ///////////////////////////////// PUBLISHING ///////////////////
 
     // JOINT PUBLISHER
-    sensor_msgs::JointState joint_msg;
-
     // from Eigen:vectorXd to pub msg
     std::vector<double> qfoo(q.data() + 7, q.data() + q.size()); // convert  e to std vector
-    joint_msg.position.resize(qfoo.size());                      // TODO fix small size
+    joint_msg.position.resize(qfoo.size());
     joint_msg.position = qfoo;
-
     std::vector<double> dqfoo(dq.data() + 6, dq.data() + dq.size()); // convert  e to std vector
-    joint_msg.velocity.resize(dqfoo.size());                         // TODO fix small size
+    joint_msg.velocity.resize(dqfoo.size());
     joint_msg.velocity = dqfoo;
-
-    joint_msg.name.resize(jnames.size());
-    joint_msg.name = jnames;
-
     joint_msg.header.stamp = ros::Time::now();
-
     joint_pub.publish(joint_msg);
 
     // ODOM PUBLISHER
-
-    nav_msgs::Odometry odom_msg;
     odom_msg.pose.pose.position.x = q(0);
     odom_msg.pose.pose.position.y = q(1);
     odom_msg.pose.pose.position.z = q(2);
@@ -317,24 +363,16 @@ int main(int argc, char *argv[])
     odom_msg.pose.pose.orientation.y = q(5);
     odom_msg.pose.pose.orientation.z = q(6);
     odom_msg.pose.pose.orientation.w = q(3);
-
     odom_msg.twist.twist.linear.x = dq(0);
     odom_msg.twist.twist.linear.y = dq(1);
     odom_msg.twist.twist.linear.z = dq(2);
     odom_msg.twist.twist.angular.x = dq(3);
     odom_msg.twist.twist.angular.y = dq(4);
     odom_msg.twist.twist.angular.z = dq(5);
-
-    odom_msg.header.frame_id = "world";
-    odom_msg.child_frame_id = "base_link";
-
     odom_msg.header.stamp = ros::Time::now();
-
     odom_pub.publish(odom_msg);
 
     //RLeg Odom Publisher
-    nav_msgs::Odometry rodom_msg;
-
     rodom_msg.pose.pose.position.x = RfootPosition(0);
     rodom_msg.pose.pose.position.y = RfootPosition(1);
     rodom_msg.pose.pose.position.z = RfootPosition(2);
@@ -342,17 +380,10 @@ int main(int argc, char *argv[])
     rodom_msg.pose.pose.orientation.y = qir.y();
     rodom_msg.pose.pose.orientation.z = qir.z();
     rodom_msg.pose.pose.orientation.w = qir.w();
-
-    rodom_msg.header.frame_id = "world";
-    rodom_msg.child_frame_id = "r_sole";
-
     rodom_msg.header.stamp = ros::Time::now();
-
     odom_pub_RLeg.publish(rodom_msg);
 
     //LLeg Odom Publisher
-    nav_msgs::Odometry lodom_msg;
-
     lodom_msg.pose.pose.position.x = LfootPosition(0);
     lodom_msg.pose.pose.position.y = LfootPosition(1);
     lodom_msg.pose.pose.position.z = LfootPosition(2);
@@ -360,48 +391,61 @@ int main(int argc, char *argv[])
     lodom_msg.pose.pose.orientation.y = qil.y();
     lodom_msg.pose.pose.orientation.z = qil.z();
     lodom_msg.pose.pose.orientation.w = qil.w();
-
-    lodom_msg.header.frame_id = "world";
-    lodom_msg.child_frame_id = "l_sole";
-
     lodom_msg.header.stamp = ros::Time::now();
-
     odom_pub_LLeg.publish(lodom_msg);
 
+    //RHand Odom Publisher
+    RHodom_msg.pose.pose.position.x = RHandPosition(0);
+    RHodom_msg.pose.pose.position.y = RHandPosition(1);
+    RHodom_msg.pose.pose.position.z = RHandPosition(2);
+    RHodom_msg.pose.pose.orientation.x = qiRH.x();
+    RHodom_msg.pose.pose.orientation.y = qiRH.y();
+    RHodom_msg.pose.pose.orientation.z = qiRH.z();
+    RHodom_msg.pose.pose.orientation.w = qiRH.w();
+    RHodom_msg.header.stamp = ros::Time::now();
+    odom_pub_RHand.publish(RHodom_msg);
+
+    //LHand Odom Publisher
+    LHodom_msg.pose.pose.position.x = LHandPosition(0);
+    LHodom_msg.pose.pose.position.y = LHandPosition(1);
+    LHodom_msg.pose.pose.position.z = LHandPosition(2);
+    LHodom_msg.pose.pose.orientation.x = qiLH.x();
+    LHodom_msg.pose.pose.orientation.y = qiLH.y();
+    LHodom_msg.pose.pose.orientation.z = qiLH.z();
+    LHodom_msg.pose.pose.orientation.w = qiLH.w();
+    LHodom_msg.header.stamp = ros::Time::now();
+    odom_pub_LHand.publish(LHodom_msg);
+
+    //Head Odom Publisher
+    Hodom_msg.pose.pose.position.x = HeadPosition(0);
+    Hodom_msg.pose.pose.position.y = HeadPosition(1);
+    Hodom_msg.pose.pose.position.z = HeadPosition(2);
+    Hodom_msg.pose.pose.orientation.x = qiH.x();
+    Hodom_msg.pose.pose.orientation.y = qiH.y();
+    Hodom_msg.pose.pose.orientation.z = qiH.z();
+    Hodom_msg.pose.pose.orientation.w = qiH.w();
+    Hodom_msg.header.stamp = ros::Time::now();
+    odom_pub_Head.publish(Hodom_msg);
+
     // FORCE TORQUE PUBLISHER
-
-    geometry_msgs::WrenchStamped wrench_msg;
-
     wrench_msg.wrench.force.x = LLegGRF(0);
     wrench_msg.wrench.force.y = LLegGRF(1);
     wrench_msg.wrench.force.z = LLegGRF(2);
-
     wrench_msg.wrench.torque.x = LLegGRT(0);
     wrench_msg.wrench.torque.y = LLegGRT(1);
     wrench_msg.wrench.torque.z = LLegGRT(2);
-
-    wrench_msg.header.frame_id = "world";
-
     wrench_msg.header.stamp = ros::Time::now();
     wrench_pub_LLeg.publish(wrench_msg);
-
     wrench_msg.wrench.force.x = RLegGRF(0);
     wrench_msg.wrench.force.y = RLegGRF(1);
     wrench_msg.wrench.force.z = RLegGRF(2);
-
     wrench_msg.wrench.torque.x = RLegGRT(0);
     wrench_msg.wrench.torque.y = RLegGRT(1);
     wrench_msg.wrench.torque.z = RLegGRT(2);
-
-    wrench_msg.header.frame_id = "world";
-
     wrench_msg.header.stamp = ros::Time::now();
     wrench_pub_RLeg.publish(wrench_msg);
 
     // GAIT PHASE PUBLISHER
-
-    std_msgs::String gait_msg;
-
     if (DS)
       gait_msg.data = "double_support";
     else if (LSS)
@@ -414,49 +458,37 @@ int main(int argc, char *argv[])
     gait_phase_pub.publish(gait_msg);
 
     // CENTER OF MASS PUBLISHER
-
-    nav_msgs::Odometry com_msg;
     com_msg.pose.pose.position.x = CoM_pos(0);
     com_msg.pose.pose.position.y = CoM_pos(1);
     com_msg.pose.pose.position.z = CoM_pos(2);
-
     com_msg.twist.twist.linear.x = CoM_vel(0);
     com_msg.twist.twist.linear.y = CoM_vel(1);
     com_msg.twist.twist.linear.z = CoM_vel(2);
-
-    com_msg.header.frame_id = "world";
-    com_msg.child_frame_id = "com";
-
     com_msg.header.stamp = ros::Time::now();
-
     com_pub.publish(com_msg);
 
     // ZERO MOMENT POINT PUBLISHER
-    geometry_msgs::PointStamped zmp_msg;
-
     zmp_msg.point.x = ZMP(0);
     zmp_msg.point.y = ZMP(1);
     zmp_msg.point.z = ZMP(2);
-
-    zmp_msg.header.frame_id = "world";
-
     zmp_msg.header.stamp = ros::Time::now();
-
     zmp_pub.publish(zmp_msg);
 
+    // COP PUBLISHER
+    lcop_msg.point.x = COPL(0);
+    lcop_msg.point.y = COPL(1);
+    lcop_msg.point.z = COPL(2);
+    lcop_msg.header.stamp = ros::Time::now();
+    LCOP_pub.publish(lcop_msg);
+    rcop_msg.point.x = COPR(0);
+    rcop_msg.point.y = COPR(1);
+    rcop_msg.point.z = COPR(2);
+    rcop_msg.header.stamp = ros::Time::now();
+    RCOP_pub.publish(rcop_msg);
+
     ////////////////////////////////// INTERGRATE ///////////////////////
-
     server.integrateWorldThreadSafe();
-
-    // auto stop = high_resolution_clock::now();
-    // auto duration = duration_cast<microseconds>(stop - start);
-    // int loop_duration = micro_dt - duration.count();
-    //
-    // if(loop_duration>0)
-    //   std::this_thread::sleep_for(std::chrono::microseconds(loop_duration));
-
     ros::spinOnce();
-
     loop_rate.sleep();
   }
 

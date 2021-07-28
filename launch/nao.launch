@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+  <rosparam file="$(find raisim_ros)/config/nao_params.yaml" command="load"/> 
+  <node pkg="raisim_ros" type="nao_ros" name="nao_ros" respawn="false" output="screen"/>
+</launch>
