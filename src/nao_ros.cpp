@@ -41,17 +41,21 @@ int main(int argc, char *argv[])
   bool enable_gravity, animation_mode;
   double jointPgain_, jointDgain_;
 
-  n_p.param<std::string>("modelname",modelname,"/home/master/catkin_ws/src/raisim_ros/rsc/nao/nao.urdf");
-  n_p.param<std::string>("activation_key",activation_key,"/home/master/raisim_workspace/raisim_examples/rsc/activation.raisim");
+  n_p.param<std::string>("modelname",modelname,"../rsc/nao/nao.urdf");
+  n_p.param<std::string>("activation_key",activation_key,"../share/raisim/activation.raisim");
   n_p.param<bool>("enable_gravity",enable_gravity,true);
   n_p.param<bool>("animation_mode",animation_mode,false);
 
   n_p.param<double>("jointPgain", jointPgain_, 350);
   n_p.param<double>("jointDgain", jointDgain_, 5);
 
+  ROS_INFO("Using RAISIM activation key.."); 
   raisim::World::setActivationKey(activation_key);
+  ROS_INFO("Creating RAISIM world.."); 
   ///create raisim world
   raisim::World world;
+
+  ROS_INFO("Populating world.."); 
   world.setTimeStep(dt);
   world.setERP(0, 0);
 
@@ -62,6 +66,7 @@ int main(int argc, char *argv[])
   auto ground = world.addGround();
   auto NAO = world.addArticulatedSystem(modelname.c_str());
 
+  ROS_INFO("Parsing joint names.."); 
   ///Remove ROOT + universe joints names from the joint name vector get only the actuated joints
   std::vector<std::string> jnames = NAO->getMovableJointNames();
   auto itr = std::find(jnames.begin(), jnames.end(), "ROOT");
@@ -102,6 +107,7 @@ int main(int argc, char *argv[])
   NAO->setPdGains(jointPgain, jointDgain);
   NAO->setName("NAO");
 
+  ROS_INFO("Launching RAISIM server.."); 
   /// launch raisim server
   raisim::RaisimServer server(&world);
   server.launchServer();
@@ -141,8 +147,8 @@ int main(int argc, char *argv[])
   Quaterniond qir, qil, qiLH, qiRH, qiH;
   Vector3d COPL, COPR, ZMP, CoM_pos, CoM_vel;
 
-  // INIT ROS PUBLISHER
-
+  ROS_INFO("Initializing ROS publishers.."); 
+  // INIT ROS PUBLISHER 
   ros::Publisher joint_pub = n.advertise<sensor_msgs::JointState>("/nao_raisim_ros/joint_states", 1000);
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/odom", 1000);
   ros::Publisher wrench_pub_LLeg = n.advertise<geometry_msgs::WrenchStamped>("/nao_raisim_ros/LLeg/force_torque_states", 1000);
@@ -194,6 +200,8 @@ int main(int argc, char *argv[])
   rcop_msg.header.frame_id = "world";
 
   ros::Rate loop_rate(120);
+
+  ROS_INFO("Entering main loop .."); 
 
   while (ros::ok())
   {
