@@ -33,7 +33,7 @@ void commandJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
 
 int main(int argc, char *argv[])
 {
-  ros::init(argc, argv, "nao_ros_publisher");
+  ros::init(argc, argv, "nao_raisim_ros_publisher");
   ros::NodeHandle n;
   ros::NodeHandle n_p("~");
 
@@ -41,10 +41,11 @@ int main(int argc, char *argv[])
   bool enable_gravity, animation_mode;
   double jointPgain_, jointDgain_;
 
-  n_p.param<std::string>("modelname",modelname,"../rsc/nao/nao.urdf");
-  n_p.param<std::string>("activation_key",activation_key,"../share/raisim/activation.raisim");
+  n_p.param<std::string>("modelname",modelname,".../rsc/nao/nao.urdf");
+  n_p.param<std::string>("activation_key",activation_key,".../rsc/activation.raisim");
   n_p.param<bool>("enable_gravity",enable_gravity,true);
   n_p.param<bool>("animation_mode",animation_mode,false);
+
 
   n_p.param<double>("jointPgain", jointPgain_, 350);
   n_p.param<double>("jointDgain", jointDgain_, 5);
@@ -64,7 +65,7 @@ int main(int argc, char *argv[])
 
   ///create objects
   auto ground = world.addGround();
-  auto NAO = world.addArticulatedSystem(modelname.c_str());
+  auto NAO = world.addArticulatedSystem(modelname);
 
   ROS_INFO("Parsing joint names.."); 
   ///Remove ROOT + universe joints names from the joint name vector get only the actuated joints
@@ -80,7 +81,7 @@ int main(int argc, char *argv[])
   cout << "Joint Names " << endl;
   for (int i = 0; i < jnames.size(); i++)
     cout << jnames[i] << endl;
-  ;
+  
 
   Eigen::VectorXd jointNominalConfig, jointNominalVelocity;
 
@@ -199,7 +200,7 @@ int main(int argc, char *argv[])
   lcop_msg.header.frame_id = "world";
   rcop_msg.header.frame_id = "world";
 
-  ros::Rate loop_rate(120);
+  ros::Rate loop_rate(100);
 
   ROS_INFO("Entering main loop .."); 
 
