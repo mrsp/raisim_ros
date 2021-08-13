@@ -32,8 +32,26 @@ void commandJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
     joint_data.pop();
 }
 
+
+
+
 int main(int argc, char *argv[])
 {
+  //Workaround because RAISIM doesn't like relative paths..
+  //Our run_it.sh will tell us our path so we can convert the relative paths to absolute 
+  const char * path=0;
+  for (int i=0; i<argc; i++)
+     {
+       if (strcmp(argv[i],"--from")==0)
+       {
+          path = argv[i+1];
+          ROS_INFO("Received ROS path to convert relative paths to absolute.."); 
+          fprintf(stderr,"Bin path = %s\n",path); 
+       }
+     }
+   //---------------------------------------------------------------------------------
+
+
   ros::init(argc, argv, "nao_raisim_ros_publisher");
   ros::NodeHandle n;
   ros::NodeHandle n_p("~");
@@ -47,6 +65,16 @@ int main(int argc, char *argv[])
   n_p.param<bool>("enable_gravity",enable_gravity,true);
   n_p.param<bool>("animation_mode",animation_mode,false);
 
+  //If we received a path lets do the conversion..
+  if (path!=0)
+    {
+     char fullPath[2048];
+     snprintf(fullPath,2048,"%s/%s",path,modelname.c_str());
+     string fullPathModelName(fullPath);
+     modelname = fullPathModelName;
+     ROS_INFO("Converted model path to .."); 
+     fprintf(stderr,"Absolute path = %s\n",fullPath); 
+    } 
 
   n_p.param<double>("jointPgain", jointPgain_, 350);
   n_p.param<double>("jointDgain", jointDgain_, 5);
@@ -63,6 +91,8 @@ int main(int argc, char *argv[])
 
   if (!enable_gravity)
     world.setGravity(Eigen::Vector3d(0, 0, 0));
+   
+
 
   ///create objects
   auto ground = world.addGround();

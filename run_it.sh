@@ -4,7 +4,7 @@
 #The old indian trick to switch to the bin/ directory across different workspaces/systems/installations
 #Works every time..
 
-#roslaunch whole_body_ik nao_wbc.launch
+#roslaunch raisim_ros nao.launch
 
 
 STARTDIR=`pwd`
