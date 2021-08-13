@@ -1,5 +1,5 @@
-modelname: "/home/master/catkin_ws/src/raisim_ros/rsc/nao/nao.urdf"
-activation_key: "/home/master/raisim_workspace/raisim_examples/rsc/activation.raisim"
+modelname: "../rsc/nao/nao.urdf"
+activation_key: "../share/raisim/activation.raisim"
 enable_gravity: True
 animation_mode: False
 jointPgain: 350
