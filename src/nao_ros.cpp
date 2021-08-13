@@ -17,6 +17,7 @@
 #include "geometry_msgs/PointStamped.h"
 #include "raisim_ros/Queue.h"
 
+
 using namespace Eigen;
 //Simulation Step, 0.01 is the hardware loop of the actual NAO
 double dt = 0.01;
@@ -41,8 +42,8 @@ int main(int argc, char *argv[])
   bool enable_gravity, animation_mode;
   double jointPgain_, jointDgain_;
 
-  n_p.param<std::string>("modelname",modelname,".../rsc/nao/nao.urdf");
-  n_p.param<std::string>("activation_key",activation_key,".../rsc/activation.raisim");
+  n_p.param<std::string>("modelname",modelname,"../rsc/nao/nao.urdf");
+  n_p.param<std::string>("activation_key",activation_key,"../rsc/activation.raisim");
   n_p.param<bool>("enable_gravity",enable_gravity,true);
   n_p.param<bool>("animation_mode",animation_mode,false);
 
@@ -203,9 +204,10 @@ int main(int argc, char *argv[])
   ros::Rate loop_rate(100);
 
   ROS_INFO("Entering main loop .."); 
-
+  
   while (ros::ok())
   {
+
     NAO->getState(q, dq);
 
     /// Get Leg Positions in raisim
@@ -496,9 +498,9 @@ int main(int argc, char *argv[])
     RCOP_pub.publish(rcop_msg);
 
     ////////////////////////////////// INTERGRATE ///////////////////////
-    server.integrateWorldThreadSafe();
     ros::spinOnce();
     loop_rate.sleep();
+    server.integrateWorldThreadSafe();
   }
 
   server.killServer();
