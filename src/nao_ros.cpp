@@ -84,12 +84,11 @@ int main(int argc, char *argv[])
     cout << jnames[i] << endl;
   
 
-  Eigen::VectorXd jointNominalConfig, jointNominalVelocity;
+  Eigen::VectorXd jointNominalConfig(NAO->getGeneralizedCoordinateDim()), jointNominalVelocity(NAO->getDOF());
 
   ///Set Nominal Configuration
-  jointNominalConfig.resize(NAO->getGeneralizedCoordinateDim());
-  jointNominalVelocity.resize(NAO->getDOF());
   jointNominalConfig.setZero();
+  jointNominalVelocity.setZero();
   jointNominalConfig << 0, 0, 0.32, 1, 0, 0, 0,
       0.0, 0.0,
       0.0, 0.0, -0.3976, 0.85, -0.4427, -0.009,
@@ -201,7 +200,7 @@ int main(int argc, char *argv[])
   lcop_msg.header.frame_id = "world";
   rcop_msg.header.frame_id = "world";
 
-  ros::Rate loop_rate(100);
+  ros::Rate loop_rate(freq);
 
   ROS_INFO("Entering main loop .."); 
   
