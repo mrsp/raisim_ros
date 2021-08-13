@@ -33,6 +33,17 @@ void commandJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
 }
 
 
+char fileExists(const char * filename)
+{
+    FILE *fp = fopen(filename,"r");
+    if( fp )
+        {
+            /* exists */ 
+            fclose(fp);
+            return 1;
+        }
+    return 0;
+}
 
 
 int main(int argc, char *argv[])
@@ -71,10 +82,18 @@ int main(int argc, char *argv[])
      char fullPath[2048];
      snprintf(fullPath,2048,"%s/%s",path,modelname.c_str());
      string fullPathModelName(fullPath);
-     modelname = fullPathModelName;
      ROS_INFO("Converted model path to .."); 
      fprintf(stderr,"Absolute path = %s\n",fullPath); 
+     
+     if (!fileExists(fullPath))
+       {
+         ROS_INFO("The absolute path we generated does not correspond to an existing file, we will not use it .."); 
+       } else 
+       {
+         modelname = fullPathModelName;
+       } 
     } 
+  //----------------------------------------------
 
   n_p.param<double>("jointPgain", jointPgain_, 350);
   n_p.param<double>("jointDgain", jointDgain_, 5);

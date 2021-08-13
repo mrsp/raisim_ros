@@ -37,7 +37,7 @@ then
  echo "$green Running freshly compiled file $normal" 
 else 
  echo "$red Could not find freshly compiled file @ $PATHOFBIN $normal" 
- PATHOFBIN="./$BINNAME --from \"$DIR\"" 
+ PATHOFBIN="./$BINNAME --from $DIR" 
   
  if [ ! -e $PATHOFBIN ]
    then 
@@ -47,7 +47,7 @@ else
    fi
 fi 
 
-LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH "$PATHOFBIN" --from \"$DIR\" $@
+LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH "$PATHOFBIN" --from $DIR $@
 
 cd "$STARTDIR"
 exit 0
