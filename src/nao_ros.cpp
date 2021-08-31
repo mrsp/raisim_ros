@@ -546,9 +546,9 @@ int main(int argc, char *argv[])
     RCOP_pub.publish(rcop_msg);
 
     ////////////////////////////////// INTERGRATE ///////////////////////
-    ros::spinOnce();
     loop_rate.sleep();
     server.integrateWorldThreadSafe();
+    ros::spinOnce();
   }
 
   server.killServer();
