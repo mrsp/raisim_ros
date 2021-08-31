@@ -345,9 +345,13 @@ int main(int argc, char *argv[])
     }
 
     if (LSS && RSS)
+    {
       DS = true;
+      LSS = false;
+      RSS = false;
+    }
 
-    if (LLegGRF(2) > 7)
+    if (LLegGRF(2) > 1)
     {
       LLeg_COP = Eigen::Vector3d(-LLegGRT(1) / LLegGRF(2), LLegGRT(0) / LLegGRF(2), 0) + LfootPosition;
       COPL = COPL / LLegGRF(2);
@@ -358,7 +362,7 @@ int main(int argc, char *argv[])
       LLeg_COP.setZero();
       COPL.setZero();
     }
-    if (RLegGRF(2) > 7)
+    if (RLegGRF(2) > 1)
     {
       RLeg_COP = Eigen::Vector3d(-RLegGRT(1) / RLegGRF(2), RLegGRT(0) / RLegGRF(2), 0) + RfootPosition;
       COPR = COPR / RLegGRF(2);
@@ -369,14 +373,21 @@ int main(int argc, char *argv[])
       RLeg_COP.setZero();
       COPR.setZero();
     }
-
-    // cout<<"COP L "<<COPL.transpose()<<" "<<LLeg_COP.transpose()<<endl;
-    // cout<<"COP R "<<COPR.transpose()<<" "<<RLeg_COP.transpose()<<endl;
+    if(RLegGRF(2) > 1 || LLegGRF(2) > 1)
+    {
+      ZMP = (COPR*RLegGRF(2) + COPL*LLegGRF(2))/(LLegGRF(2) + RLegGRF(2));
+      ZMP(2) = (COPR(2) + COPL(2))/2.0;
+    }
+    else
+      ZMP.setZero();
+      
+    //cout<<"COP L "<<COPL.transpose()<<" "<<LLeg_COP.transpose()<<endl;
+    //cout<<"COP R "<<COPR.transpose()<<" "<<RLeg_COP.transpose()<<endl;
     raisim::Vec<3> linear_momentum = NAO->getLinearMomentum();
     raisim::Vec<3> center_of_mass = NAO->getCOM();
 
-    ZMP = COPR + COPL;
-    ZMP(2) /= 2.0;
+
+
     CoM_vel = Vector3d(linear_momentum(0), linear_momentum(1), linear_momentum(2)) / mass;
     CoM_pos = Vector3d(center_of_mass(0), center_of_mass(1), center_of_mass(2));
 
