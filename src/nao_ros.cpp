@@ -12,6 +12,7 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "sensor_msgs/JointState.h"
+#include "sensor_msgs/Imu.h"
 #include "nav_msgs/Odometry.h"
 #include "geometry_msgs/WrenchStamped.h"
 #include "geometry_msgs/PointStamped.h"
@@ -189,13 +190,16 @@ int main(int argc, char *argv[])
   auto HeadFrameIndex = NAO->getFrameIdxByName(head_frame);
 
   Eigen::Vector3d RLegGRF, RLegGRT, LLegGRF, LLegGRT, footForce, footTorque, LLeg_COP, RLeg_COP;
-  raisim::Vec<3> footPosition;
+  raisim::Vec<3> footPosition, footLinearVelocity, footAngularVelocity;
   raisim::Mat<3, 3> footOrientation;
   Affine3d Tir, Til, TiLH, TiRH, TiH;
-  Eigen::Vector3d RfootPosition, LfootPosition, HeadPosition, RHandPosition, LHandPosition;
+  Eigen::Vector3d RfootPosition, LfootPosition, HeadPosition, RHandPosition, LHandPosition, LfootLinearVelocity, LfootLinearVelocity_, LfootAngularVelocity, LfootLinearAcceleration,  RfootLinearVelocity, RfootLinearVelocity_, RfootAngularVelocity, RfootLinearAcceleration;
   Eigen::Matrix3d RfootOrientation, LfootOrientation, RHandOrientation, LHandOrientation, HeadOrientation;
   Quaterniond qir, qil, qiLH, qiRH, qiH;
   Vector3d COPL, COPR, ZMP, CoM_pos, CoM_vel;
+  RfootLinearVelocity.setZero();
+  LfootLinearVelocity.setZero();
+  bool initialized = false;
 
   ROS_INFO("Initializing ROS publishers.."); 
   // INIT ROS PUBLISHER 
@@ -214,6 +218,9 @@ int main(int argc, char *argv[])
   ros::Publisher LCOP_pub = n.advertise<geometry_msgs::PointStamped>("/nao_raisim_ros/LLeg/COP", 1000);
   ros::Publisher RCOP_pub = n.advertise<geometry_msgs::PointStamped>("/nao_raisim_ros/RLeg/COP", 1000);
   ros::Subscriber command_js_sub = n.subscribe("/nao_raisim_ros/command_joint_states", 1000, commandJointStatesCallback);
+  
+  ros::Publisher imu_pub_LLeg = n.advertise<sensor_msgs::Imu>("/nao_raisim_ros/LLeg/imu", 1000);
+  ros::Publisher imu_pub_RLeg = n.advertise<sensor_msgs::Imu>("/nao_raisim_ros/RLeg/imu", 1000);
 
   sensor_msgs::JointState joint_msg;
   joint_msg.name.resize(jnames.size());
@@ -238,7 +245,6 @@ int main(int argc, char *argv[])
   Hodom_msg.child_frame_id = "Head";
   geometry_msgs::WrenchStamped wrench_msg;
   wrench_msg.header.frame_id = "world";
-
   std_msgs::String gait_msg;
   nav_msgs::Odometry com_msg;
   com_msg.header.frame_id = "world";
@@ -248,11 +254,13 @@ int main(int argc, char *argv[])
   geometry_msgs::PointStamped lcop_msg, rcop_msg;
   lcop_msg.header.frame_id = "world";
   rcop_msg.header.frame_id = "world";
+  sensor_msgs::Imu imu_msg;
+  imu_msg.header.frame_id = "world";
+
 
   ros::Rate loop_rate(freq);
-
   ROS_INFO("Entering main loop .."); 
-  
+
   while (ros::ok())
   {
 
@@ -263,19 +271,34 @@ int main(int argc, char *argv[])
     NAO->getFrameOrientation(RfootFrameIndex, footOrientation);
     RfootPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
     RfootOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
-
     Tir.translation() = RfootPosition;
     Tir.linear() = RfootOrientation;
     qir = Quaterniond(RfootOrientation);
+    NAO->getFrameVelocity(RfootFrameIndex, footLinearVelocity);
+    RfootLinearVelocity_ = RfootLinearVelocity;
+    RfootLinearVelocity = Eigen::Vector3d(footLinearVelocity[0], footLinearVelocity[1], footLinearVelocity[2]);
+    RfootLinearAcceleration = (RfootLinearVelocity - RfootLinearVelocity_)*freq;
+    NAO->getFrameAngularVelocity(RfootFrameIndex, footAngularVelocity);
+    RfootAngularVelocity = Eigen::Vector3d(footAngularVelocity[0], footAngularVelocity[1], footAngularVelocity[2]);
+
+
+
 
     NAO->getFramePosition(LfootFrameIndex, footPosition);
     NAO->getFrameOrientation(LfootFrameIndex, footOrientation);
     LfootPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
-
     LfootOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
     Til.translation() = LfootPosition;
     Til.linear() = LfootOrientation;
     qil = Quaterniond(LfootOrientation);
+    NAO->getFrameVelocity(LfootFrameIndex, footLinearVelocity);
+    LfootLinearVelocity_ = LfootLinearVelocity;
+    LfootLinearVelocity = Eigen::Vector3d(footLinearVelocity[0], footLinearVelocity[1], footLinearVelocity[2]);
+    LfootLinearAcceleration = (LfootLinearVelocity - LfootLinearVelocity_)*freq;
+
+    NAO->getFrameAngularVelocity(LfootFrameIndex, footAngularVelocity);
+    LfootAngularVelocity = Eigen::Vector3d(footAngularVelocity[0], footAngularVelocity[1], footAngularVelocity[2]);
+
 
     /// Get Hand Positions in raisim
     NAO->getFramePosition(RHandFrameIndex, footPosition);
@@ -412,150 +435,199 @@ int main(int argc, char *argv[])
     else
       NAO->setPdTarget(jointNominalConfig, jointNominalVelocity);
 
-    ///////////////////////////////// PUBLISHING ///////////////////
 
-    // JOINT PUBLISHER
-    // from Eigen:vectorXd to pub msg
-    std::vector<double> qfoo(q.data() + 7, q.data() + q.size()); // convert  e to std vector
-    joint_msg.position.resize(qfoo.size());
-    joint_msg.position = qfoo;
-    std::vector<double> dqfoo(dq.data() + 6, dq.data() + dq.size()); // convert  e to std vector
-    joint_msg.velocity.resize(dqfoo.size());
-    joint_msg.velocity = dqfoo;
-    joint_msg.header.stamp = ros::Time::now();
-    joint_pub.publish(joint_msg);
 
-    // ODOM PUBLISHER
-    odom_msg.pose.pose.position.x = q(0);
-    odom_msg.pose.pose.position.y = q(1);
-    odom_msg.pose.pose.position.z = q(2);
-    odom_msg.pose.pose.orientation.x = q(4);
-    odom_msg.pose.pose.orientation.y = q(5);
-    odom_msg.pose.pose.orientation.z = q(6);
-    odom_msg.pose.pose.orientation.w = q(3);
-    odom_msg.twist.twist.linear.x = dq(0);
-    odom_msg.twist.twist.linear.y = dq(1);
-    odom_msg.twist.twist.linear.z = dq(2);
-    odom_msg.twist.twist.angular.x = dq(3);
-    odom_msg.twist.twist.angular.y = dq(4);
-    odom_msg.twist.twist.angular.z = dq(5);
-    odom_msg.header.stamp = ros::Time::now();
-    odom_pub.publish(odom_msg);
-
-    //RLeg Odom Publisher
-    rodom_msg.pose.pose.position.x = RfootPosition(0);
-    rodom_msg.pose.pose.position.y = RfootPosition(1);
-    rodom_msg.pose.pose.position.z = RfootPosition(2);
-    rodom_msg.pose.pose.orientation.x = qir.x();
-    rodom_msg.pose.pose.orientation.y = qir.y();
-    rodom_msg.pose.pose.orientation.z = qir.z();
-    rodom_msg.pose.pose.orientation.w = qir.w();
-    rodom_msg.header.stamp = ros::Time::now();
-    odom_pub_RLeg.publish(rodom_msg);
-
-    //LLeg Odom Publisher
-    lodom_msg.pose.pose.position.x = LfootPosition(0);
-    lodom_msg.pose.pose.position.y = LfootPosition(1);
-    lodom_msg.pose.pose.position.z = LfootPosition(2);
-    lodom_msg.pose.pose.orientation.x = qil.x();
-    lodom_msg.pose.pose.orientation.y = qil.y();
-    lodom_msg.pose.pose.orientation.z = qil.z();
-    lodom_msg.pose.pose.orientation.w = qil.w();
-    lodom_msg.header.stamp = ros::Time::now();
-    odom_pub_LLeg.publish(lodom_msg);
-
-    //RHand Odom Publisher
-    RHodom_msg.pose.pose.position.x = RHandPosition(0);
-    RHodom_msg.pose.pose.position.y = RHandPosition(1);
-    RHodom_msg.pose.pose.position.z = RHandPosition(2);
-    RHodom_msg.pose.pose.orientation.x = qiRH.x();
-    RHodom_msg.pose.pose.orientation.y = qiRH.y();
-    RHodom_msg.pose.pose.orientation.z = qiRH.z();
-    RHodom_msg.pose.pose.orientation.w = qiRH.w();
-    RHodom_msg.header.stamp = ros::Time::now();
-    odom_pub_RHand.publish(RHodom_msg);
-
-    //LHand Odom Publisher
-    LHodom_msg.pose.pose.position.x = LHandPosition(0);
-    LHodom_msg.pose.pose.position.y = LHandPosition(1);
-    LHodom_msg.pose.pose.position.z = LHandPosition(2);
-    LHodom_msg.pose.pose.orientation.x = qiLH.x();
-    LHodom_msg.pose.pose.orientation.y = qiLH.y();
-    LHodom_msg.pose.pose.orientation.z = qiLH.z();
-    LHodom_msg.pose.pose.orientation.w = qiLH.w();
-    LHodom_msg.header.stamp = ros::Time::now();
-    odom_pub_LHand.publish(LHodom_msg);
-
-    //Head Odom Publisher
-    Hodom_msg.pose.pose.position.x = HeadPosition(0);
-    Hodom_msg.pose.pose.position.y = HeadPosition(1);
-    Hodom_msg.pose.pose.position.z = HeadPosition(2);
-    Hodom_msg.pose.pose.orientation.x = qiH.x();
-    Hodom_msg.pose.pose.orientation.y = qiH.y();
-    Hodom_msg.pose.pose.orientation.z = qiH.z();
-    Hodom_msg.pose.pose.orientation.w = qiH.w();
-    Hodom_msg.header.stamp = ros::Time::now();
-    odom_pub_Head.publish(Hodom_msg);
-
-    // FORCE TORQUE PUBLISHER
-    wrench_msg.wrench.force.x = LLegGRF(0);
-    wrench_msg.wrench.force.y = LLegGRF(1);
-    wrench_msg.wrench.force.z = LLegGRF(2);
-    wrench_msg.wrench.torque.x = LLegGRT(0);
-    wrench_msg.wrench.torque.y = LLegGRT(1);
-    wrench_msg.wrench.torque.z = LLegGRT(2);
-    wrench_msg.header.stamp = ros::Time::now();
-    wrench_pub_LLeg.publish(wrench_msg);
-    wrench_msg.wrench.force.x = RLegGRF(0);
-    wrench_msg.wrench.force.y = RLegGRF(1);
-    wrench_msg.wrench.force.z = RLegGRF(2);
-    wrench_msg.wrench.torque.x = RLegGRT(0);
-    wrench_msg.wrench.torque.y = RLegGRT(1);
-    wrench_msg.wrench.torque.z = RLegGRT(2);
-    wrench_msg.header.stamp = ros::Time::now();
-    wrench_pub_RLeg.publish(wrench_msg);
-
-    // GAIT PHASE PUBLISHER
-    if (DS)
-      gait_msg.data = "double_support";
-    else if (LSS)
-      gait_msg.data = "left_support";
-    else if (RSS)
-      gait_msg.data = "right_support";
+    if(!initialized)
+    {
+      initialized = true;
+    }
     else
-      gait_msg.data = "flight";
+    {
+      ///////////////////////////////// PUBLISHING ///////////////////
+      // JOINT PUBLISHER
+      // from Eigen:vectorXd to pub msg
+      std::vector<double> qfoo(q.data() + 7, q.data() + q.size()); // convert  e to std vector
+      joint_msg.position.resize(qfoo.size());
+      joint_msg.position = qfoo;
+      std::vector<double> dqfoo(dq.data() + 6, dq.data() + dq.size()); // convert  e to std vector
+      joint_msg.velocity.resize(dqfoo.size());
+      joint_msg.velocity = dqfoo;
+      joint_msg.header.stamp = ros::Time::now();
+      joint_pub.publish(joint_msg);
 
-    gait_phase_pub.publish(gait_msg);
+      // ODOM PUBLISHER
+      odom_msg.pose.pose.position.x = q(0);
+      odom_msg.pose.pose.position.y = q(1);
+      odom_msg.pose.pose.position.z = q(2);
+      odom_msg.pose.pose.orientation.x = q(4);
+      odom_msg.pose.pose.orientation.y = q(5);
+      odom_msg.pose.pose.orientation.z = q(6);
+      odom_msg.pose.pose.orientation.w = q(3);
+      odom_msg.twist.twist.linear.x = dq(0);
+      odom_msg.twist.twist.linear.y = dq(1);
+      odom_msg.twist.twist.linear.z = dq(2);
+      odom_msg.twist.twist.angular.x = dq(3);
+      odom_msg.twist.twist.angular.y = dq(4);
+      odom_msg.twist.twist.angular.z = dq(5);
+      odom_msg.header.stamp = ros::Time::now();
+      odom_pub.publish(odom_msg);
 
-    // CENTER OF MASS PUBLISHER
-    com_msg.pose.pose.position.x = CoM_pos(0);
-    com_msg.pose.pose.position.y = CoM_pos(1);
-    com_msg.pose.pose.position.z = CoM_pos(2);
-    com_msg.twist.twist.linear.x = CoM_vel(0);
-    com_msg.twist.twist.linear.y = CoM_vel(1);
-    com_msg.twist.twist.linear.z = CoM_vel(2);
-    com_msg.header.stamp = ros::Time::now();
-    com_pub.publish(com_msg);
+      //RLeg Odom Publisher
+      rodom_msg.pose.pose.position.x = RfootPosition(0);
+      rodom_msg.pose.pose.position.y = RfootPosition(1);
+      rodom_msg.pose.pose.position.z = RfootPosition(2);
+      rodom_msg.pose.pose.orientation.x = qir.x();
+      rodom_msg.pose.pose.orientation.y = qir.y();
+      rodom_msg.pose.pose.orientation.z = qir.z();
+      rodom_msg.pose.pose.orientation.w = qir.w();
+      rodom_msg.twist.twist.linear.x = RfootLinearVelocity(0);
+      rodom_msg.twist.twist.linear.y = RfootLinearVelocity(1);
+      rodom_msg.twist.twist.linear.z = RfootLinearVelocity(2);
+      rodom_msg.twist.twist.angular.x = RfootAngularVelocity(0);
+      rodom_msg.twist.twist.angular.y = RfootAngularVelocity(1);
+      rodom_msg.twist.twist.angular.z = RfootAngularVelocity(2);
 
-    // ZERO MOMENT POINT PUBLISHER
-    zmp_msg.point.x = ZMP(0);
-    zmp_msg.point.y = ZMP(1);
-    zmp_msg.point.z = ZMP(2);
-    zmp_msg.header.stamp = ros::Time::now();
-    zmp_pub.publish(zmp_msg);
 
-    // COP PUBLISHER
-    lcop_msg.point.x = COPL(0);
-    lcop_msg.point.y = COPL(1);
-    lcop_msg.point.z = COPL(2);
-    lcop_msg.header.stamp = ros::Time::now();
-    LCOP_pub.publish(lcop_msg);
-    rcop_msg.point.x = COPR(0);
-    rcop_msg.point.y = COPR(1);
-    rcop_msg.point.z = COPR(2);
-    rcop_msg.header.stamp = ros::Time::now();
-    RCOP_pub.publish(rcop_msg);
+      rodom_msg.header.stamp = ros::Time::now();
+      odom_pub_RLeg.publish(rodom_msg);
 
+      //LLeg Odom Publisher
+      lodom_msg.pose.pose.position.x = LfootPosition(0);
+      lodom_msg.pose.pose.position.y = LfootPosition(1);
+      lodom_msg.pose.pose.position.z = LfootPosition(2);
+      lodom_msg.pose.pose.orientation.x = qil.x();
+      lodom_msg.pose.pose.orientation.y = qil.y();
+      lodom_msg.pose.pose.orientation.z = qil.z();
+      lodom_msg.pose.pose.orientation.w = qil.w();
+      lodom_msg.twist.twist.linear.x = LfootLinearVelocity(0);
+      lodom_msg.twist.twist.linear.y = LfootLinearVelocity(1);
+      lodom_msg.twist.twist.linear.z = LfootLinearVelocity(2);
+      lodom_msg.twist.twist.angular.x = LfootAngularVelocity(0);
+      lodom_msg.twist.twist.angular.y = LfootAngularVelocity(1);
+      lodom_msg.twist.twist.angular.z = LfootAngularVelocity(2);
+      lodom_msg.header.stamp = ros::Time::now();
+      odom_pub_LLeg.publish(lodom_msg);
+
+      //RHand Odom Publisher
+      RHodom_msg.pose.pose.position.x = RHandPosition(0);
+      RHodom_msg.pose.pose.position.y = RHandPosition(1);
+      RHodom_msg.pose.pose.position.z = RHandPosition(2);
+      RHodom_msg.pose.pose.orientation.x = qiRH.x();
+      RHodom_msg.pose.pose.orientation.y = qiRH.y();
+      RHodom_msg.pose.pose.orientation.z = qiRH.z();
+      RHodom_msg.pose.pose.orientation.w = qiRH.w();
+      RHodom_msg.header.stamp = ros::Time::now();
+      odom_pub_RHand.publish(RHodom_msg);
+
+      //LHand Odom Publisher
+      LHodom_msg.pose.pose.position.x = LHandPosition(0);
+      LHodom_msg.pose.pose.position.y = LHandPosition(1);
+      LHodom_msg.pose.pose.position.z = LHandPosition(2);
+      LHodom_msg.pose.pose.orientation.x = qiLH.x();
+      LHodom_msg.pose.pose.orientation.y = qiLH.y();
+      LHodom_msg.pose.pose.orientation.z = qiLH.z();
+      LHodom_msg.pose.pose.orientation.w = qiLH.w();
+      LHodom_msg.header.stamp = ros::Time::now();
+      odom_pub_LHand.publish(LHodom_msg);
+
+      //Head Odom Publisher
+      Hodom_msg.pose.pose.position.x = HeadPosition(0);
+      Hodom_msg.pose.pose.position.y = HeadPosition(1);
+      Hodom_msg.pose.pose.position.z = HeadPosition(2);
+      Hodom_msg.pose.pose.orientation.x = qiH.x();
+      Hodom_msg.pose.pose.orientation.y = qiH.y();
+      Hodom_msg.pose.pose.orientation.z = qiH.z();
+      Hodom_msg.pose.pose.orientation.w = qiH.w();
+      Hodom_msg.header.stamp = ros::Time::now();
+      odom_pub_Head.publish(Hodom_msg);
+
+      // FORCE TORQUE PUBLISHER
+      wrench_msg.wrench.force.x = LLegGRF(0);
+      wrench_msg.wrench.force.y = LLegGRF(1);
+      wrench_msg.wrench.force.z = LLegGRF(2);
+      wrench_msg.wrench.torque.x = LLegGRT(0);
+      wrench_msg.wrench.torque.y = LLegGRT(1);
+      wrench_msg.wrench.torque.z = LLegGRT(2);
+      wrench_msg.header.stamp = ros::Time::now();
+      wrench_pub_LLeg.publish(wrench_msg);
+      wrench_msg.wrench.force.x = RLegGRF(0);
+      wrench_msg.wrench.force.y = RLegGRF(1);
+      wrench_msg.wrench.force.z = RLegGRF(2);
+      wrench_msg.wrench.torque.x = RLegGRT(0);
+      wrench_msg.wrench.torque.y = RLegGRT(1);
+      wrench_msg.wrench.torque.z = RLegGRT(2);
+      wrench_msg.header.stamp = ros::Time::now();
+      wrench_pub_RLeg.publish(wrench_msg);
+
+      // GAIT PHASE PUBLISHER
+      if (DS)
+        gait_msg.data = "double_support";
+      else if (LSS)
+        gait_msg.data = "left_support";
+      else if (RSS)
+        gait_msg.data = "right_support";
+      else
+        gait_msg.data = "flight";
+
+      gait_phase_pub.publish(gait_msg);
+
+      // CENTER OF MASS PUBLISHER
+      com_msg.pose.pose.position.x = CoM_pos(0);
+      com_msg.pose.pose.position.y = CoM_pos(1);
+      com_msg.pose.pose.position.z = CoM_pos(2);
+      com_msg.twist.twist.linear.x = CoM_vel(0);
+      com_msg.twist.twist.linear.y = CoM_vel(1);
+      com_msg.twist.twist.linear.z = CoM_vel(2);
+      com_msg.header.stamp = ros::Time::now();
+      com_pub.publish(com_msg);
+
+      // ZERO MOMENT POINT PUBLISHER
+      zmp_msg.point.x = ZMP(0);
+      zmp_msg.point.y = ZMP(1);
+      zmp_msg.point.z = ZMP(2);
+      zmp_msg.header.stamp = ros::Time::now();
+      zmp_pub.publish(zmp_msg);
+
+      // COP PUBLISHER
+      lcop_msg.point.x = COPL(0);
+      lcop_msg.point.y = COPL(1);
+      lcop_msg.point.z = COPL(2);
+      lcop_msg.header.stamp = ros::Time::now();
+      LCOP_pub.publish(lcop_msg);
+      rcop_msg.point.x = COPR(0);
+      rcop_msg.point.y = COPR(1);
+      rcop_msg.point.z = COPR(2);
+      rcop_msg.header.stamp = ros::Time::now();
+      RCOP_pub.publish(rcop_msg);
+
+
+      //IMU PUBLISHER
+      imu_msg.angular_velocity.x = LfootLinearVelocity(0);
+      imu_msg.angular_velocity.y = LfootLinearVelocity(1);
+      imu_msg.angular_velocity.z = LfootLinearVelocity(2);
+      imu_msg.linear_acceleration.x = LfootLinearAcceleration(0);
+      imu_msg.linear_acceleration.y = LfootLinearAcceleration(1);
+      imu_msg.linear_acceleration.z = LfootLinearAcceleration(2);
+      imu_msg.orientation.x = qil.x();
+      imu_msg.orientation.y = qil.y();
+      imu_msg.orientation.z = qil.z();
+      imu_msg.orientation.w = qil.w();
+      imu_msg.header.stamp = ros::Time::now();
+      imu_pub_LLeg.publish(imu_msg);
+
+      imu_msg.angular_velocity.x = RfootLinearVelocity(0);
+      imu_msg.angular_velocity.y = RfootLinearVelocity(1);
+      imu_msg.angular_velocity.z = RfootLinearVelocity(2);
+      imu_msg.linear_acceleration.x = RfootLinearAcceleration(0);
+      imu_msg.linear_acceleration.y = RfootLinearAcceleration(1);
+      imu_msg.linear_acceleration.z = RfootLinearAcceleration(2);
+      imu_msg.orientation.x = qir.x();
+      imu_msg.orientation.y = qir.y();
+      imu_msg.orientation.z = qir.z();
+      imu_msg.orientation.w = qir.w();
+      imu_msg.header.stamp = ros::Time::now();
+      imu_pub_RLeg.publish(imu_msg);
+    }
     ////////////////////////////////// INTERGRATE ///////////////////////
     loop_rate.sleep();
     server.integrateWorldThreadSafe();
