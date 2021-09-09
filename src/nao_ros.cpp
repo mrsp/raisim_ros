@@ -602,9 +602,9 @@ int main(int argc, char *argv[])
 
 
       //IMU PUBLISHER
-      imu_msg.angular_velocity.x = LfootLinearVelocity(0);
-      imu_msg.angular_velocity.y = LfootLinearVelocity(1);
-      imu_msg.angular_velocity.z = LfootLinearVelocity(2);
+      imu_msg.angular_velocity.x = LfootAngularVelocity(0);
+      imu_msg.angular_velocity.y = LfootAngularVelocity(1);
+      imu_msg.angular_velocity.z = LfootAngularVelocity(2);
       imu_msg.linear_acceleration.x = LfootLinearAcceleration(0);
       imu_msg.linear_acceleration.y = LfootLinearAcceleration(1);
       imu_msg.linear_acceleration.z = LfootLinearAcceleration(2);
@@ -615,9 +615,9 @@ int main(int argc, char *argv[])
       imu_msg.header.stamp = ros::Time::now();
       imu_pub_LLeg.publish(imu_msg);
 
-      imu_msg.angular_velocity.x = RfootLinearVelocity(0);
-      imu_msg.angular_velocity.y = RfootLinearVelocity(1);
-      imu_msg.angular_velocity.z = RfootLinearVelocity(2);
+      imu_msg.angular_velocity.x = RfootAngularVelocity(0);
+      imu_msg.angular_velocity.y = RfootAngularVelocity(1);
+      imu_msg.angular_velocity.z = RfootAngularVelocity(2);
       imu_msg.linear_acceleration.x = RfootLinearAcceleration(0);
       imu_msg.linear_acceleration.y = RfootLinearAcceleration(1);
       imu_msg.linear_acceleration.z = RfootLinearAcceleration(2);
