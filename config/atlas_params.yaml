@@ -1,0 +1,4 @@
+modelname: "../rsc/atlas/robot.urdf"
+activation_key: "../share/raisim/activation.raisim"
+enable_gravity: True
+animation_mode: False

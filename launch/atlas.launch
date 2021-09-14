@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="raisim_ros" type="run_atlas.sh" name="atlas_ros" respawn="false" output="screen">
+    <rosparam file="$(find raisim_ros)/config/atlas_params.yaml" command="load"/> 
+  </node>
+</launch>

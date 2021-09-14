@@ -20,12 +20,46 @@
 
 
 using namespace Eigen;
-//Simulation Step, 0.01 is the hardware loop of the actual NAO
-double dt = 0.01;
+//Simulation Step, 0.001 is the hardware loop of the actual atlas
+double dt = 0.001;
 double freq = 1.0 / dt;
 int micro_dt = dt * 1000000;
-Queue<sensor_msgs::JointStateConstPtr> joint_data;
 
+enum JointDevices
+{
+  back_bkz = 0,
+  back_bky,
+  back_bkx,
+  l_arm_shz,
+  l_arm_shx,
+  l_arm_ely,
+  l_arm_elx,
+  l_arm_wry,
+  l_arm_wrx,
+  l_arm_wry2,
+  r_arm_shz,
+  r_arm_shx,
+  r_arm_ely,
+  r_arm_elx,
+  r_arm_wry,
+  r_arm_wrx,
+  r_arm_wry2,
+  l_leg_hpz,
+  l_leg_hpx,
+  l_leg_hpy,
+  l_leg_kny,
+  l_leg_aky,
+  l_leg_akx,
+  r_leg_hpz,
+  r_leg_hpx,
+  r_leg_hpy,
+  r_leg_kny,
+  r_leg_aky,
+  r_leg_akx
+};
+
+
+Queue<sensor_msgs::JointStateConstPtr> joint_data;
 void commandJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
 {
   joint_data.push(msg);
@@ -64,7 +98,7 @@ int main(int argc, char *argv[])
    //---------------------------------------------------------------------------------
 
 
-  ros::init(argc, argv, "nao_raisim_ros_publisher");
+  ros::init(argc, argv, "atlas_raisim_ros_publisher");
   ros::NodeHandle n;
   ros::NodeHandle n_p("~");
 
@@ -72,7 +106,7 @@ int main(int argc, char *argv[])
   bool enable_gravity, animation_mode;
   double jointPgain_, jointDgain_;
 
-  n_p.param<std::string>("modelname",modelname,"../rsc/nao/nao.urdf");
+  n_p.param<std::string>("modelname",modelname,"../rsc/atlas/robot.urdf");
   n_p.param<std::string>("activation_key",activation_key,"../rsc/activation.raisim");
   n_p.param<bool>("enable_gravity",enable_gravity,true);
   n_p.param<bool>("animation_mode",animation_mode,false);
@@ -96,8 +130,6 @@ int main(int argc, char *argv[])
     } 
   //----------------------------------------------
 
-  n_p.param<double>("jointPgain", jointPgain_, 350);
-  n_p.param<double>("jointDgain", jointDgain_, 5);
 
   ROS_INFO("Using RAISIM activation key.."); 
   raisim::World::setActivationKey(activation_key);
@@ -116,11 +148,11 @@ int main(int argc, char *argv[])
 
   ///create objects
   auto ground = world.addGround();
-  auto NAO = world.addArticulatedSystem(modelname);
+  auto atlas = world.addArticulatedSystem(modelname);
 
   ROS_INFO("Parsing joint names.."); 
   ///Remove ROOT + universe joints names from the joint name vector get only the actuated joints
-  std::vector<std::string> jnames = NAO->getMovableJointNames();
+  std::vector<std::string> jnames = atlas->getMovableJointNames();
   auto itr = std::find(jnames.begin(), jnames.end(), "ROOT");
   if (itr != jnames.end())
     jnames.erase(itr);
@@ -134,60 +166,135 @@ int main(int argc, char *argv[])
     cout << jnames[i] << endl;
   
 
-  Eigen::VectorXd jointNominalConfig(NAO->getGeneralizedCoordinateDim()), jointNominalVelocity(NAO->getDOF());
+  Eigen::VectorXd jointNominalConfig(atlas->getGeneralizedCoordinateDim()), jointNominalVelocity(atlas->getDOF());
 
   ///Set Nominal Configuration
   jointNominalConfig.setZero();
   jointNominalVelocity.setZero();
-  jointNominalConfig << 0, 0, 0.32, 1, 0, 0, 0,
-      0.0, 0.0,
-      0.0, 0.0, -0.3976, 0.85, -0.4427, -0.009,
-      0.0, 0.0, -0.3976, 0.85, -0.4427, -0.009,
-      1.5, 0.15, 0, -0.0349066, -1.5, 0,
-      1.5, -0.15, 0, 0.0349066, 1.5, 0;
+  jointNominalConfig << 0, 0, 0.89, 1, 0, 0, 0, 0, 0, 0, 0, -1.57, 0, 0, 0, 0, 0, 0, 1.57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
+  jointNominalConfig[7 + 1] = 0.035;
+  jointNominalConfig[7 + 17] = 0;
+  jointNominalConfig[7 + 18] = 0;
+  jointNominalConfig[7 + 19] = -0.48760839223861694;
+  jointNominalConfig[7 + 20] = 0.8850983381271362;
+  jointNominalConfig[7 + 21] = -0.43169957399368286;
+  jointNominalConfig[7 + 23] = 0;
+  jointNominalConfig[7 + 24] = 0;
+  jointNominalConfig[7 + 25] = -0.48760839223861694;
+  jointNominalConfig[7 + 26] = 0.8850983381271362;
+  jointNominalConfig[7 + 27] = -0.43169957399368286;
 
   ///Set Joint PD Gains
-  Eigen::VectorXd jointPgain(NAO->getDOF()), jointDgain(NAO->getDOF());
-  jointPgain.setConstant(jointPgain_);
-  jointDgain.setConstant(jointDgain_); //Gazebo D gain is 0.1 but makes NAO unstable in raisim
+  Eigen::VectorXd jointPgain(atlas->getDOF()), jointDgain(atlas->getDOF());
+  //7 DOF ARMs
+  jointPgain[6 + l_arm_elx] = 100;
+  jointPgain[6 + r_arm_elx] = 100;
+  jointPgain[6 + l_arm_ely] = 100;
+  jointPgain[6 + r_arm_ely] = 100;
+  jointPgain[6 + l_arm_wrx] = 100;
+  jointPgain[6 + r_arm_wrx] = 100;
+  jointPgain[6 + l_arm_shx] = 200;
+  jointPgain[6 + r_arm_shx] = 200;
+  jointPgain[6 + l_arm_shz] = 200;
+  jointPgain[6 + r_arm_shz] = 200;
+  jointPgain[6 + l_arm_wry] = 100;
+  jointPgain[6 + r_arm_wry] = 100;
+  jointPgain[6 + l_arm_wry2] = 50;
+  jointPgain[6 + r_arm_wry2] = 50;
+
+  jointDgain[6 + l_arm_elx] = 5;
+  jointDgain[6 + r_arm_elx] = 5;
+  jointDgain[6 + l_arm_ely] = 5;
+  jointDgain[6 + r_arm_ely] = 5;
+  jointDgain[6 + l_arm_wrx] = 5;
+  jointDgain[6 + r_arm_wrx] = 5;
+  jointDgain[6 + l_arm_shx] = 20;
+  jointDgain[6 + r_arm_shx] = 20;
+  jointDgain[6 + l_arm_shz] = 20;
+  jointDgain[6 + r_arm_shz] = 20;
+  jointDgain[6 + l_arm_wry] = 5;
+  jointDgain[6 + r_arm_wry] = 5;
+
+  jointDgain[6 + r_arm_wry2] = 0.1;
+  jointDgain[6 + l_arm_wry2] = 0.1;
+
+
+  //6 DOF legs
+  jointPgain[6 + l_leg_kny] = 1000;
+  jointPgain[6 + r_leg_kny] = 1000;
+  jointPgain[6 + l_leg_akx] = 100;
+  jointPgain[6 + r_leg_akx] = 100;
+  jointPgain[6 + l_leg_aky] = 1000;
+  jointPgain[6 + r_leg_aky] = 1000;
+  jointPgain[6 + l_leg_hpy] = 1000;
+  jointPgain[6 + r_leg_hpy] = 1000;
+  jointPgain[6 + l_leg_hpx] = 1000;
+  jointPgain[6 + r_leg_hpx] = 1000;
+  jointPgain[6 + l_leg_hpz] = 100;
+  jointPgain[6 + r_leg_hpz] = 100;
+
+  jointDgain[6 + l_leg_kny] = 10;
+  jointDgain[6 + r_leg_kny] = 10;
+  jointDgain[6 + l_leg_akx] = 1;
+  jointDgain[6 + r_leg_akx] = 1;
+  jointDgain[6 + l_leg_aky] = 10;
+  jointDgain[6 + r_leg_aky] = 10;
+  jointDgain[6 + l_leg_hpy] = 10;
+  jointDgain[6 + r_leg_hpy] = 10;
+  jointDgain[6 + l_leg_hpx] = 10;
+  jointDgain[6 + r_leg_hpx] = 10;
+  jointDgain[6 + l_leg_hpz] = 10;
+  jointDgain[6 + r_leg_hpz] = 10;
+
+
+  //3 DOF Torso
+  jointPgain[6 + back_bkz] = 5000;
+  jointPgain[6 + back_bkx] = 5000;
+  jointPgain[6 + back_bky] = 5000;
+
+  jointDgain[6 + back_bkz] = 20;
+  jointDgain[6 + back_bkx] = 20;
+  jointDgain[6 + back_bky] = 20;
+
 
   ///Set the Initial Configuration in the world
-  NAO->setGeneralizedCoordinate(jointNominalConfig);
-  NAO->setGeneralizedVelocity(jointNominalVelocity);
-  NAO->setGeneralizedForce(Eigen::VectorXd::Zero(NAO->getDOF()));
-  NAO->setPdGains(jointPgain, jointDgain);
-  NAO->setName("NAO");
+  atlas->setGeneralizedCoordinate(jointNominalConfig);
+  atlas->setGeneralizedVelocity(jointNominalVelocity);
+  atlas->setGeneralizedForce(Eigen::VectorXd::Zero(atlas->getDOF()));
+  atlas->setPdGains(jointPgain*20, jointDgain*50);
+  atlas->setName("atlas");
 
+  atlas->printOutBodyNamesInOrder();
+  atlas->printOutFrameNamesInOrder();
   ROS_INFO("Launching RAISIM server.."); 
   /// launch raisim server
   raisim::RaisimServer server(&world);
   server.launchServer();
-  server.focusOn(NAO);
+  server.focusOn(atlas);
 
   /// q, dq is the actual configuration from raisim
-  Eigen::VectorXd q(NAO->getGeneralizedCoordinateDim()), dq(NAO->getDOF());
-
+  Eigen::VectorXd q(atlas->getGeneralizedCoordinateDim()), dq(atlas->getDOF());
   /// Set Desired Frames for the WBC
-  string lfoot_frame = "l_sole";
-  string rfoot_frame = "r_sole";
-  string base_frame = "base_link";
-  string lhand_frame = "LHand";
-  string rhand_frame = "RHand";
-  string head_frame = "HeadYaw";
+  string lfoot_frame = "l_foot";
+  string rfoot_frame = "r_foot";
+  string base_frame = "pelvis";
+  string lhand_frame = "l_arm_wry2";
+  string rhand_frame = "r_arm_wry2";
+  string head_frame = "neck_ry";
 
-  double mass = NAO->getTotalMass();
+  double mass = atlas->getTotalMass();
   bool LSS, RSS, DS;
   bool firstCoMVel = true;
 
   /// For Contact Detection, COP, GRF and GRT computation
-  auto RfootIndex = NAO->getBodyIdx("r_ankle");
-  auto LfootIndex = NAO->getBodyIdx("l_ankle");
+  auto RfootIndex = atlas->getBodyIdx(rfoot_frame);
+  auto LfootIndex = atlas->getBodyIdx(lfoot_frame);
 
-  auto RfootFrameIndex = NAO->getFrameIdxByName("RLeg_effector_fixedjoint");
-  auto LfootFrameIndex = NAO->getFrameIdxByName("LLeg_effector_fixedjoint");
-  auto RHandFrameIndex = NAO->getFrameIdxByName(rhand_frame);
-  auto LHandFrameIndex = NAO->getFrameIdxByName(lhand_frame);
-  auto HeadFrameIndex = NAO->getFrameIdxByName(head_frame);
+  auto RfootFrameIndex = atlas->getFrameIdxByName("r_leg_akx");
+  auto LfootFrameIndex = atlas->getFrameIdxByName("l_leg_akx");
+  auto RHandFrameIndex = atlas->getFrameIdxByName("r_arm_wry2");
+  auto LHandFrameIndex = atlas->getFrameIdxByName("l_arm_wry2");
+  auto HeadFrameIndex = atlas->getFrameIdxByName("neck_ry");
 
   Eigen::Vector3d RLegGRF, RLegGRT, LLegGRF, LLegGRT, footForce, footTorque, LLeg_COP, RLeg_COP, baseLinearVelocity, baseLinearVelocity_, baseLinearAcceleration;
   raisim::Vec<3> footPosition, footLinearVelocity, footAngularVelocity;
@@ -197,54 +304,54 @@ int main(int argc, char *argv[])
   Eigen::Matrix3d RfootOrientation, LfootOrientation, RHandOrientation, LHandOrientation, HeadOrientation;
   Quaterniond qir, qil, qiLH, qiRH, qiH;
   Vector3d COPL, COPR, ZMP, CoM_pos, CoM_vel;
-  baseLinearVelocity.setZero();
   RfootLinearVelocity.setZero();
   LfootLinearVelocity.setZero();
+  baseLinearVelocity.setZero();
   bool initialized = false;
 
   ROS_INFO("Initializing ROS publishers.."); 
   // INIT ROS PUBLISHER 
-  ros::Publisher joint_pub = n.advertise<sensor_msgs::JointState>("/nao_raisim_ros/joint_states", 1000);
-  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/odom", 1000);
-  ros::Publisher wrench_pub_LLeg = n.advertise<geometry_msgs::WrenchStamped>("/nao_raisim_ros/LLeg/force_torque_states", 1000);
-  ros::Publisher wrench_pub_RLeg = n.advertise<geometry_msgs::WrenchStamped>("/nao_raisim_ros/RLeg/force_torque_states", 1000);
-  ros::Publisher gait_phase_pub = n.advertise<std_msgs::String>("/nao_raisim_ros/gait_phase", 1000);
-  ros::Publisher com_pub = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/CoM", 1000);
-  ros::Publisher odom_pub_LLeg = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/LLeg/odom", 1000);
-  ros::Publisher odom_pub_RLeg = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/RLeg/odom", 1000);
-  ros::Publisher odom_pub_LHand = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/LHand/odom", 1000);
-  ros::Publisher odom_pub_RHand = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/RHand/odom", 1000);
-  ros::Publisher odom_pub_Head = n.advertise<nav_msgs::Odometry>("/nao_raisim_ros/Head/odom", 1000);
-  ros::Publisher zmp_pub = n.advertise<geometry_msgs::PointStamped>("/nao_raisim_ros/ZMP", 1000);
-  ros::Publisher LCOP_pub = n.advertise<geometry_msgs::PointStamped>("/nao_raisim_ros/LLeg/COP", 1000);
-  ros::Publisher RCOP_pub = n.advertise<geometry_msgs::PointStamped>("/nao_raisim_ros/RLeg/COP", 1000);
-  ros::Subscriber command_js_sub = n.subscribe("/nao_raisim_ros/command_joint_states", 1000, commandJointStatesCallback);
+  ros::Publisher joint_pub = n.advertise<sensor_msgs::JointState>("/atlas_raisim_ros/joint_states", 1000);
+  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("/atlas_raisim_ros/odom", 1000);
+  ros::Publisher wrench_pub_LLeg = n.advertise<geometry_msgs::WrenchStamped>("/atlas_raisim_ros/LLeg/force_torque_states", 1000);
+  ros::Publisher wrench_pub_RLeg = n.advertise<geometry_msgs::WrenchStamped>("/atlas_raisim_ros/RLeg/force_torque_states", 1000);
+  ros::Publisher gait_phase_pub = n.advertise<std_msgs::String>("/atlas_raisim_ros/gait_phase", 1000);
+  ros::Publisher com_pub = n.advertise<nav_msgs::Odometry>("/atlas_raisim_ros/CoM", 1000);
+  ros::Publisher odom_pub_LLeg = n.advertise<nav_msgs::Odometry>("/atlas_raisim_ros/LLeg/odom", 1000);
+  ros::Publisher odom_pub_RLeg = n.advertise<nav_msgs::Odometry>("/atlas_raisim_ros/RLeg/odom", 1000);
+  ros::Publisher odom_pub_LHand = n.advertise<nav_msgs::Odometry>("/atlas_raisim_ros/LHand/odom", 1000);
+  ros::Publisher odom_pub_RHand = n.advertise<nav_msgs::Odometry>("/atlas_raisim_ros/RHand/odom", 1000);
+  ros::Publisher odom_pub_Head = n.advertise<nav_msgs::Odometry>("/atlas_raisim_ros/Head/odom", 1000);
+  ros::Publisher zmp_pub = n.advertise<geometry_msgs::PointStamped>("/atlas_raisim_ros/ZMP", 1000);
+  ros::Publisher LCOP_pub = n.advertise<geometry_msgs::PointStamped>("/atlas_raisim_ros/LLeg/COP", 1000);
+  ros::Publisher RCOP_pub = n.advertise<geometry_msgs::PointStamped>("/atlas_raisim_ros/RLeg/COP", 1000);
+  ros::Subscriber command_js_sub = n.subscribe("/atlas_raisim_ros/command_joint_states", 1000, commandJointStatesCallback);
   
-  ros::Publisher imu_pub_LLeg = n.advertise<sensor_msgs::Imu>("/nao_raisim_ros/LLeg/imu", 1000);
-  ros::Publisher imu_pub_RLeg = n.advertise<sensor_msgs::Imu>("/nao_raisim_ros/RLeg/imu", 1000);
-  ros::Publisher imu_pub = n.advertise<sensor_msgs::Imu>("/nao_raisim_ros/imu", 1000);
+  ros::Publisher imu_pub_LLeg = n.advertise<sensor_msgs::Imu>("/atlas_raisim_ros/LLeg/imu", 1000);
+  ros::Publisher imu_pub_RLeg = n.advertise<sensor_msgs::Imu>("/atlas_raisim_ros/RLeg/imu", 1000);
+  ros::Publisher imu_pub = n.advertise<sensor_msgs::Imu>("/atlas_raisim_ros/imu", 1000);
 
   sensor_msgs::JointState joint_msg;
   joint_msg.name.resize(jnames.size());
   joint_msg.name = jnames;
   nav_msgs::Odometry odom_msg;
   odom_msg.header.frame_id = "world";
-  odom_msg.child_frame_id = "base_link";
+  odom_msg.child_frame_id = "pelvis";
   nav_msgs::Odometry rodom_msg;
   rodom_msg.header.frame_id = "world";
-  rodom_msg.child_frame_id = "r_sole";
+  rodom_msg.child_frame_id = "r_foot";
   nav_msgs::Odometry lodom_msg;
   lodom_msg.header.frame_id = "world";
-  lodom_msg.child_frame_id = "l_sole";
+  lodom_msg.child_frame_id = "l_foot";
   nav_msgs::Odometry RHodom_msg;
   RHodom_msg.header.frame_id = "world";
-  RHodom_msg.child_frame_id = "RHand";
+  RHodom_msg.child_frame_id = "r_arm_wry2";
   nav_msgs::Odometry LHodom_msg;
   LHodom_msg.header.frame_id = "world";
-  LHodom_msg.child_frame_id = "LHand";
+  LHodom_msg.child_frame_id = "l_arm_wry2";
   nav_msgs::Odometry Hodom_msg;
   Hodom_msg.header.frame_id = "world";
-  Hodom_msg.child_frame_id = "Head";
+  Hodom_msg.child_frame_id = "neck_ry";
   geometry_msgs::WrenchStamped wrench_msg;
   wrench_msg.header.frame_id = "world";
   std_msgs::String gait_msg;
@@ -266,48 +373,48 @@ int main(int argc, char *argv[])
   while (ros::ok())
   {
 
-    NAO->getState(q, dq);
+    atlas->getState(q, dq);
     /// Compute Base Linear Acceleration
     baseLinearVelocity_ = baseLinearVelocity;
     baseLinearVelocity = dq.head(3);
     baseLinearAcceleration = (baseLinearVelocity - baseLinearVelocity_) * freq;
     /// Get Leg Positions in raisim
-    NAO->getFramePosition(RfootFrameIndex, footPosition);
-    NAO->getFrameOrientation(RfootFrameIndex, footOrientation);
+    atlas->getFramePosition(RfootFrameIndex, footPosition);
+    atlas->getFrameOrientation(RfootFrameIndex, footOrientation);
     RfootPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
     RfootOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
     Tir.translation() = RfootPosition;
     Tir.linear() = RfootOrientation;
     qir = Quaterniond(RfootOrientation);
-    NAO->getFrameVelocity(RfootFrameIndex, footLinearVelocity);
+    atlas->getFrameVelocity(RfootFrameIndex, footLinearVelocity);
     RfootLinearVelocity_ = RfootLinearVelocity;
     RfootLinearVelocity = Eigen::Vector3d(footLinearVelocity[0], footLinearVelocity[1], footLinearVelocity[2]);
     RfootLinearAcceleration = (RfootLinearVelocity - RfootLinearVelocity_)*freq;
-    NAO->getFrameAngularVelocity(RfootFrameIndex, footAngularVelocity);
+    atlas->getFrameAngularVelocity(RfootFrameIndex, footAngularVelocity);
     RfootAngularVelocity = Eigen::Vector3d(footAngularVelocity[0], footAngularVelocity[1], footAngularVelocity[2]);
 
 
 
 
-    NAO->getFramePosition(LfootFrameIndex, footPosition);
-    NAO->getFrameOrientation(LfootFrameIndex, footOrientation);
+    atlas->getFramePosition(LfootFrameIndex, footPosition);
+    atlas->getFrameOrientation(LfootFrameIndex, footOrientation);
     LfootPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
     LfootOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
     Til.translation() = LfootPosition;
     Til.linear() = LfootOrientation;
     qil = Quaterniond(LfootOrientation);
-    NAO->getFrameVelocity(LfootFrameIndex, footLinearVelocity);
+    atlas->getFrameVelocity(LfootFrameIndex, footLinearVelocity);
     LfootLinearVelocity_ = LfootLinearVelocity;
     LfootLinearVelocity = Eigen::Vector3d(footLinearVelocity[0], footLinearVelocity[1], footLinearVelocity[2]);
     LfootLinearAcceleration = (LfootLinearVelocity - LfootLinearVelocity_)*freq;
 
-    NAO->getFrameAngularVelocity(LfootFrameIndex, footAngularVelocity);
+    atlas->getFrameAngularVelocity(LfootFrameIndex, footAngularVelocity);
     LfootAngularVelocity = Eigen::Vector3d(footAngularVelocity[0], footAngularVelocity[1], footAngularVelocity[2]);
 
 
     /// Get Hand Positions in raisim
-    NAO->getFramePosition(RHandFrameIndex, footPosition);
-    NAO->getFrameOrientation(RHandFrameIndex, footOrientation);
+    atlas->getFramePosition(RHandFrameIndex, footPosition);
+    atlas->getFrameOrientation(RHandFrameIndex, footOrientation);
     RHandPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
     RHandOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
 
@@ -315,8 +422,8 @@ int main(int argc, char *argv[])
     TiRH.linear() = RHandOrientation;
     qiRH = Quaterniond(RHandOrientation);
 
-    NAO->getFramePosition(LHandFrameIndex, footPosition);
-    NAO->getFrameOrientation(LHandFrameIndex, footOrientation);
+    atlas->getFramePosition(LHandFrameIndex, footPosition);
+    atlas->getFrameOrientation(LHandFrameIndex, footOrientation);
     LHandPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
     LHandOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
 
@@ -325,8 +432,8 @@ int main(int argc, char *argv[])
     qiLH = Quaterniond(LHandOrientation);
 
     //Get Head Position
-    NAO->getFramePosition(HeadFrameIndex, footPosition);
-    NAO->getFrameOrientation(HeadFrameIndex, footOrientation);
+    atlas->getFramePosition(HeadFrameIndex, footPosition);
+    atlas->getFrameOrientation(HeadFrameIndex, footOrientation);
     HeadPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
     HeadOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
 
@@ -344,11 +451,11 @@ int main(int argc, char *argv[])
     COPL.setZero();
     COPR.setZero();
     /// for all contacts on the robot, check ...
-    for (auto &contact : NAO->getContacts())
+    for (auto &contact : atlas->getContacts())
     {
       if (contact.skip())
         continue; /// if the contact is internal, one contact point is set to 'skip'
-      if (RfootIndex == contact.getlocalBodyIndex() && fabs(contact.getPosition().e()(2) - RfootPosition(2)) < 0.015)
+      if (RfootIndex == contact.getlocalBodyIndex())
       {
         footForce = contact.getContactFrame().e().transpose() * contact.getImpulse().e() / dt;
         RLegGRF += footForce;
@@ -359,7 +466,7 @@ int main(int argc, char *argv[])
         if (contact.isObjectA())
           RSS = true;
       }
-      if (LfootIndex == contact.getlocalBodyIndex() && fabs(contact.getPosition().e()(2) - LfootPosition(2)) < 0.015)
+      if (LfootIndex == contact.getlocalBodyIndex())
       {
         footForce = contact.getContactFrame().e().transpose() * contact.getImpulse().e() / dt;
         LLegGRF += footForce;
@@ -411,8 +518,8 @@ int main(int argc, char *argv[])
       
     //cout<<"COP L "<<COPL.transpose()<<" "<<LLeg_COP.transpose()<<endl;
     //cout<<"COP R "<<COPR.transpose()<<" "<<RLeg_COP.transpose()<<endl;
-    raisim::Vec<3> linear_momentum = NAO->getLinearMomentum();
-    raisim::Vec<3> center_of_mass = NAO->getCOM();
+    raisim::Vec<3> linear_momentum = atlas->getLinearMomentum();
+    raisim::Vec<3> center_of_mass = atlas->getCOM();
 
 
 
@@ -426,19 +533,19 @@ int main(int argc, char *argv[])
       sensor_msgs::JointStateConstPtr msg = joint_data.pop();
       std::vector<double> pos_vector = msg->position;
       double *pos_array = pos_vector.data();
-      jointNominalConfig = Eigen::Map<Eigen::Matrix<double, 33, 1>>(pos_array);
+      jointNominalConfig = Eigen::Map<Eigen::Matrix<double, 36, 1>>(pos_array);
 
       std::vector<double> vel_vector = msg->velocity;
       double *vel_array = vel_vector.data();
-      jointNominalVelocity = Eigen::Map<Eigen::Matrix<double, 32, 1>>(vel_array);
+      jointNominalVelocity = Eigen::Map<Eigen::Matrix<double, 35, 1>>(vel_array);
     }
     if (animation_mode)
     {
-      NAO->setGeneralizedCoordinate(jointNominalConfig);
-      NAO->setGeneralizedVelocity(jointNominalVelocity);
+      atlas->setGeneralizedCoordinate(jointNominalConfig);
+      atlas->setGeneralizedVelocity(jointNominalVelocity);
     }
     else
-      NAO->setPdTarget(jointNominalConfig, jointNominalVelocity);
+      atlas->setPdTarget(jointNominalConfig, jointNominalVelocity);
 
 
 
@@ -632,7 +739,6 @@ int main(int argc, char *argv[])
       imu_msg.orientation.w = qir.w();
       imu_msg.header.stamp = ros::Time::now();
       imu_pub_RLeg.publish(imu_msg);
-
 
       imu_msg.angular_velocity.x = dq(3);
       imu_msg.angular_velocity.y = dq(4);
