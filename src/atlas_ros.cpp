@@ -110,7 +110,8 @@ int main(int argc, char *argv[])
   n_p.param<std::string>("activation_key",activation_key,"../rsc/activation.raisim");
   n_p.param<bool>("enable_gravity",enable_gravity,true);
   n_p.param<bool>("animation_mode",animation_mode,false);
-
+  n_p.param<double>("jointPgain", jointPgain_, 350);
+  n_p.param<double>("jointDgain", jointDgain_, 5);
   //If we received a path lets do the conversion..
   if (path!=0)
     {
@@ -171,7 +172,7 @@ int main(int argc, char *argv[])
   ///Set Nominal Configuration
   jointNominalConfig.setZero();
   jointNominalVelocity.setZero();
-  jointNominalConfig << 0, 0, 0.89, 1, 0, 0, 0, 0, 0, 0, 0, -1.57, 0, 0, 0, 0, 0, 0, 1.57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
+  jointNominalConfig << 0.03, 0, 0.88, 1, 0, 0, 0, 0, 0, 0, 0, -1.57, 0, 0, 0, 0, 0, 0, 1.57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
   jointNominalConfig[7 + 1] = 0.035;
   jointNominalConfig[7 + 17] = 0;
   jointNominalConfig[7 + 18] = 0;
@@ -186,75 +187,77 @@ int main(int argc, char *argv[])
 
   ///Set Joint PD Gains
   Eigen::VectorXd jointPgain(atlas->getDOF()), jointDgain(atlas->getDOF());
+  jointPgain.setConstant(jointPgain_);
+  jointDgain.setConstant(jointDgain_); 
   //7 DOF ARMs
-  jointPgain[6 + l_arm_elx] = 100;
-  jointPgain[6 + r_arm_elx] = 100;
-  jointPgain[6 + l_arm_ely] = 100;
-  jointPgain[6 + r_arm_ely] = 100;
-  jointPgain[6 + l_arm_wrx] = 100;
-  jointPgain[6 + r_arm_wrx] = 100;
-  jointPgain[6 + l_arm_shx] = 200;
-  jointPgain[6 + r_arm_shx] = 200;
-  jointPgain[6 + l_arm_shz] = 200;
-  jointPgain[6 + r_arm_shz] = 200;
-  jointPgain[6 + l_arm_wry] = 100;
-  jointPgain[6 + r_arm_wry] = 100;
-  jointPgain[6 + l_arm_wry2] = 50;
-  jointPgain[6 + r_arm_wry2] = 50;
+  // jointPgain[6 + l_arm_elx] = 100;
+  // jointPgain[6 + r_arm_elx] = 100;
+  // jointPgain[6 + l_arm_ely] = 100;
+  // jointPgain[6 + r_arm_ely] = 100;
+  // jointPgain[6 + l_arm_wrx] = 100;
+  // jointPgain[6 + r_arm_wrx] = 100;
+  // jointPgain[6 + l_arm_shx] = 200;
+  // jointPgain[6 + r_arm_shx] = 200;
+  // jointPgain[6 + l_arm_shz] = 200;
+  // jointPgain[6 + r_arm_shz] = 200;
+  // jointPgain[6 + l_arm_wry] = 100;
+  // jointPgain[6 + r_arm_wry] = 100;
+  // jointPgain[6 + l_arm_wry2] = 50;
+  // jointPgain[6 + r_arm_wry2] = 50;
 
-  jointDgain[6 + l_arm_elx] = 5;
-  jointDgain[6 + r_arm_elx] = 5;
-  jointDgain[6 + l_arm_ely] = 5;
-  jointDgain[6 + r_arm_ely] = 5;
-  jointDgain[6 + l_arm_wrx] = 5;
-  jointDgain[6 + r_arm_wrx] = 5;
-  jointDgain[6 + l_arm_shx] = 20;
-  jointDgain[6 + r_arm_shx] = 20;
-  jointDgain[6 + l_arm_shz] = 20;
-  jointDgain[6 + r_arm_shz] = 20;
-  jointDgain[6 + l_arm_wry] = 5;
-  jointDgain[6 + r_arm_wry] = 5;
+  // jointDgain[6 + l_arm_elx] = 5;
+  // jointDgain[6 + r_arm_elx] = 5;
+  // jointDgain[6 + l_arm_ely] = 5;
+  // jointDgain[6 + r_arm_ely] = 5;
+  // jointDgain[6 + l_arm_wrx] = 5;
+  // jointDgain[6 + r_arm_wrx] = 5;
+  // jointDgain[6 + l_arm_shx] = 20;
+  // jointDgain[6 + r_arm_shx] = 20;
+  // jointDgain[6 + l_arm_shz] = 20;
+  // jointDgain[6 + r_arm_shz] = 20;
+  // jointDgain[6 + l_arm_wry] = 5;
+  // jointDgain[6 + r_arm_wry] = 5;
 
-  jointDgain[6 + r_arm_wry2] = 0.1;
-  jointDgain[6 + l_arm_wry2] = 0.1;
-
-
-  //6 DOF legs
-  jointPgain[6 + l_leg_kny] = 1000;
-  jointPgain[6 + r_leg_kny] = 1000;
-  jointPgain[6 + l_leg_akx] = 100;
-  jointPgain[6 + r_leg_akx] = 100;
-  jointPgain[6 + l_leg_aky] = 1000;
-  jointPgain[6 + r_leg_aky] = 1000;
-  jointPgain[6 + l_leg_hpy] = 1000;
-  jointPgain[6 + r_leg_hpy] = 1000;
-  jointPgain[6 + l_leg_hpx] = 1000;
-  jointPgain[6 + r_leg_hpx] = 1000;
-  jointPgain[6 + l_leg_hpz] = 100;
-  jointPgain[6 + r_leg_hpz] = 100;
-
-  jointDgain[6 + l_leg_kny] = 10;
-  jointDgain[6 + r_leg_kny] = 10;
-  jointDgain[6 + l_leg_akx] = 1;
-  jointDgain[6 + r_leg_akx] = 1;
-  jointDgain[6 + l_leg_aky] = 10;
-  jointDgain[6 + r_leg_aky] = 10;
-  jointDgain[6 + l_leg_hpy] = 10;
-  jointDgain[6 + r_leg_hpy] = 10;
-  jointDgain[6 + l_leg_hpx] = 10;
-  jointDgain[6 + r_leg_hpx] = 10;
-  jointDgain[6 + l_leg_hpz] = 10;
-  jointDgain[6 + r_leg_hpz] = 10;
+  // jointDgain[6 + r_arm_wry2] = 0.1;
+  // jointDgain[6 + l_arm_wry2] = 0.1;
 
 
-  //3 DOF Torso
-  jointPgain[6 + back_bkz] = 5000;
-  jointPgain[6 + back_bkx] = 5000;
-  jointPgain[6 + back_bky] = 5000;
+  // //6 DOF legs
+  // jointPgain[6 + l_leg_kny] = 1000;
+  // jointPgain[6 + r_leg_kny] = 1000;
+  // jointPgain[6 + l_leg_akx] = 100;
+  // jointPgain[6 + r_leg_akx] = 100;
+  // jointPgain[6 + l_leg_aky] = 1000;
+  // jointPgain[6 + r_leg_aky] = 1000;
+  // jointPgain[6 + l_leg_hpy] = 1000;
+  // jointPgain[6 + r_leg_hpy] = 1000;
+  // jointPgain[6 + l_leg_hpx] = 1000;
+  // jointPgain[6 + r_leg_hpx] = 1000;
+  // jointPgain[6 + l_leg_hpz] = 100;
+  // jointPgain[6 + r_leg_hpz] = 100;
 
-  jointDgain[6 + back_bkz] = 20;
-  jointDgain[6 + back_bkx] = 20;
-  jointDgain[6 + back_bky] = 20;
+  // jointDgain[6 + l_leg_kny] = 10;
+  // jointDgain[6 + r_leg_kny] = 10;
+  // jointDgain[6 + l_leg_akx] = 1;
+  // jointDgain[6 + r_leg_akx] = 1;
+  // jointDgain[6 + l_leg_aky] = 10;
+  // jointDgain[6 + r_leg_aky] = 10;
+  // jointDgain[6 + l_leg_hpy] = 10;
+  // jointDgain[6 + r_leg_hpy] = 10;
+  // jointDgain[6 + l_leg_hpx] = 10;
+  // jointDgain[6 + r_leg_hpx] = 10;
+  // jointDgain[6 + l_leg_hpz] = 10;
+  // jointDgain[6 + r_leg_hpz] = 10;
+
+
+  // //3 DOF Torso
+  // jointPgain[6 + back_bkz] = 5000;
+  // jointPgain[6 + back_bkx] = 5000;
+  // jointPgain[6 + back_bky] = 5000;
+
+  // jointDgain[6 + back_bkz] = 20;
+  // jointDgain[6 + back_bkx] = 20;
+  // jointDgain[6 + back_bky] = 20;
 
 
   ///Set the Initial Configuration in the world
