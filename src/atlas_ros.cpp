@@ -172,18 +172,7 @@ int main(int argc, char *argv[])
   ///Set Nominal Configuration
   jointNominalConfig.setZero();
   jointNominalVelocity.setZero();
-  jointNominalConfig << 0.03, 0, 0.88, 1, 0, 0, 0, 0, 0, 0, 0, -1.57, 0, 0, 0, 0, 0, 0, 1.57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
-  jointNominalConfig[7 + 1] = 0.035;
-  jointNominalConfig[7 + 17] = 0;
-  jointNominalConfig[7 + 18] = 0;
-  jointNominalConfig[7 + 19] = -0.48760839223861694;
-  jointNominalConfig[7 + 20] = 0.8850983381271362;
-  jointNominalConfig[7 + 21] = -0.43169957399368286;
-  jointNominalConfig[7 + 23] = 0;
-  jointNominalConfig[7 + 24] = 0;
-  jointNominalConfig[7 + 25] = -0.48760839223861694;
-  jointNominalConfig[7 + 26] = 0.8850983381271362;
-  jointNominalConfig[7 + 27] = -0.43169957399368286;
+  jointNominalConfig << 0.03, 0,0.88 , 1 ,  0 , 0,0, 0, 0.000, 0, 0 , -1.57,  0  , 0,0,0,0,0,1.57 ,0,0,0,0 ,0, 0 , 0, -0.47,  0.90,   -0.43, 0, 0 ,0 ,-0.47, 0.90,  -0.43, 0;
 
   ///Set Joint PD Gains
   Eigen::VectorXd jointPgain(atlas->getDOF()), jointDgain(atlas->getDOF());
@@ -264,7 +253,7 @@ int main(int argc, char *argv[])
   atlas->setGeneralizedCoordinate(jointNominalConfig);
   atlas->setGeneralizedVelocity(jointNominalVelocity);
   atlas->setGeneralizedForce(Eigen::VectorXd::Zero(atlas->getDOF()));
-  atlas->setPdGains(jointPgain*20, jointDgain*50);
+  atlas->setPdGains(jointPgain, jointDgain);
   atlas->setName("atlas");
 
   atlas->printOutBodyNamesInOrder();
