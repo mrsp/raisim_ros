@@ -71,6 +71,15 @@ Eigen::MatrixXd parseCSV(string filename, int data_dim)
   return data;
 }
 
+Eigen::VectorXd PDControl(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd dq, Eigen::VectorXd dqd, Eigen::MatrixXd P, Eigen::MatrixXd D)
+{
+  Eigen::VectorXd tau;
+  tau.setZero(q.size());
+  
+  tau = P*(qd-q) + D*(dqd-dq); 
+  return tau;
+}
+
 void swapQuatWXYZ(Eigen::VectorXd &input_)
 {
   Eigen::VectorXd tmp(input_.size());

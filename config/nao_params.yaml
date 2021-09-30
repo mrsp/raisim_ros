@@ -4,3 +4,5 @@ enable_gravity: True
 animation_mode: False
 jointPgain: 150.0
 jointDgain: 10.0
+#jointPgain: 10000000.0
+#jointDgain: 100000.0
