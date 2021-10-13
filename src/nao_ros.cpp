@@ -154,7 +154,6 @@ int main(int argc, char *argv[])
   ///Set the Initial Configuration in the world
   NAO->setGeneralizedCoordinate(jointNominalConfig);
   NAO->setGeneralizedVelocity(jointNominalVelocity);
-  NAO->setGeneralizedForce(Eigen::VectorXd::Zero(NAO->getDOF()));
   NAO->setPdGains(jointPgain, jointDgain);
   NAO->setName("NAO");
 
@@ -438,8 +437,15 @@ int main(int argc, char *argv[])
       NAO->setGeneralizedVelocity(jointNominalVelocity);
     }
     else
+    {
       NAO->setPdTarget(jointNominalConfig, jointNominalVelocity);
-
+      VectorXd tau;
+      // tau.setZero(NAO->getDOF());
+      // tau.tail(NAO->getDOF()-6) = PDControl(q.tail(NAO->getGeneralizedCoordinateDim()-7), jointNominalConfig.tail(NAO->getGeneralizedCoordinateDim()-7), 
+      // dq.tail(NAO->getDOF()-6), jointNominalVelocity.tail(NAO->getDOF()-6), jointPgain.tail(NAO->getDOF()-6).asDiagonal(), jointDgain.tail(NAO->getDOF()-6).asDiagonal());
+      // cout<<"Joint Torque "<<tau.transpose()<<" "<<tau.size()<<endl;
+      // NAO->setGeneralizedForce(tau);
+    }
 
 
     if(!initialized)
