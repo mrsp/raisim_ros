@@ -274,7 +274,7 @@
       </geometry>
     </collision>
   </link>
-  <link name="l_foot">
+  <link name="l_foot" material="steel">
     <inertial>
       <mass value="2.410"/>
       <origin rpy="0 0 0" xyz="0.027 0 -0.067"/>
@@ -290,6 +290,9 @@
       <geometry>
         <box size="0.227 0.133887 0.05"/>
       </geometry>
+      <material name="steel">
+        <contact name ="steel"/>
+      </material>
     </collision>
     <collision>
       <origin rpy="0 0 0" xyz="0.1225 0 -0.0641"/>
@@ -669,7 +672,7 @@
       </geometry>
     </collision>
   </link>
-  <link name="r_foot">
+  <link name="r_foot" material = "steel">
     <inertial>
       <mass value="2.41"/>
       <origin rpy="0 0 0" xyz="0.027 0 -0.067"/>
@@ -685,6 +688,9 @@
       <geometry>
         <box size="0.227 0.133887 0.05"/>
       </geometry>
+      <material name="steel">
+         <contact name ="steel"/>
+      </material>
     </collision>
     <collision>
       <origin rpy="0 0 0" xyz="0.1225 0 -0.0641"/>

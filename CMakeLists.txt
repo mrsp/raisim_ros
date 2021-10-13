@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(raisim_ros)
 
 
-list(APPEND CMAKE_PREFIX_PATH /home/master/raisim_build)
+list(APPEND CMAKE_PREFIX_PATH /home/michael/raisim_build)
 
 
 ## Compile as C++11, supported in ROS Kinetic and newer

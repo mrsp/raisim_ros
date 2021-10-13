@@ -73,7 +73,7 @@ char fileExists(const char * filename)
     FILE *fp = fopen(filename,"r");
     if( fp )
         {
-            /* exists */ 
+            /* exists */
             fclose(fp);
             return 1;
         }
@@ -84,15 +84,15 @@ char fileExists(const char * filename)
 int main(int argc, char *argv[])
 {
   //Workaround because RAISIM doesn't like relative paths..
-  //Our run_it.sh will tell us our path so we can convert the relative paths to absolute 
+  //Our run_it.sh will tell us our path so we can convert the relative paths to absolute
   const char * path=0;
   for (int i=0; i<argc; i++)
      {
        if (strcmp(argv[i],"--from")==0)
        {
           path = argv[i+1];
-          ROS_INFO("Received ROS path to convert relative paths to absolute.."); 
-          fprintf(stderr,"Bin path = %s\n",path); 
+          ROS_INFO("Received ROS path to convert relative paths to absolute..");
+          fprintf(stderr,"Bin path = %s\n",path);
        }
      }
    //---------------------------------------------------------------------------------
@@ -118,40 +118,77 @@ int main(int argc, char *argv[])
      char fullPath[2048];
      snprintf(fullPath,2048,"%s/%s",path,modelname.c_str());
      string fullPathModelName(fullPath);
-     ROS_INFO("Converted model path to .."); 
-     fprintf(stderr,"Absolute path = %s\n",fullPath); 
-     
+     ROS_INFO("Converted model path to ..");
+     fprintf(stderr,"Absolute path = %s\n",fullPath);
+
      if (!fileExists(fullPath))
        {
-         ROS_INFO("The absolute path we generated does not correspond to an existing file, we will not use it .."); 
-       } else 
+         ROS_INFO("The absolute path we generated does not correspond to an existing file, we will not use it ..");
+       } else
        {
          modelname = fullPathModelName;
-       } 
-    } 
+       }
+    }
   //----------------------------------------------
 
 
-  ROS_INFO("Using RAISIM activation key.."); 
+  ROS_INFO("Using RAISIM activation key..");
   raisim::World::setActivationKey(activation_key);
-  ROS_INFO("Creating RAISIM world.."); 
+
+  ROS_INFO("Creating RAISIM world..");
   ///create raisim world
   raisim::World world;
 
-  ROS_INFO("Populating world.."); 
+  /* Mixalis scene generation for raisim simulation */
+
+  /*  Add height map to raisim. Dont forget to remove the "world.addGround", Otherwise u will have both.
+
+  raisim::TerrainProperties terrainProperties;
+  terrainProperties.frequency = 0.2;
+  terrainProperties.zScale = -0.2;
+  terrainProperties.xSize = 40.0;
+  terrainProperties.ySize = 40.0;
+  terrainProperties.xSamples = 50;
+  terrainProperties.ySamples = 50;
+  terrainProperties.fractalOctaves = 3;
+  terrainProperties.fractalLacunarity = 2.0;
+  terrainProperties.fractalGain = 0.25;
+
+  // auto sphere = world.addSphere(0.1, 0.0);
+  auto hm = world.addHeightMap(0,0,terrainProperties);
+  */
+
+  // Add small stones in order to test contact detection
+  // int number_of_stones{100};
+  // for (int i = 0 ; i < number_of_stones ;++i){
+  //   auto stone_i = world.addSphere(0.001,1,"steel");
+  //   stone_i->setPosition(i/5.+0.1,0.1*std::pow(-1,i),0.5);
+  // }
+
+
+  ROS_INFO("Populating world..");
   world.setTimeStep(dt);
   world.setERP(0, 0);
 
   if (!enable_gravity)
     world.setGravity(Eigen::Vector3d(0, 0, 0));
-   
+
 
 
   ///create objects
-  auto ground = world.addGround();
+  auto ground = world.addGround(0.0 ,"glass");
+  auto banana1= world.addBox(0.3,0.15,0.001,10.,"steel");
+  auto banana2= world.addBox(0.3,0.15,0.001,10.,"steel");
+
+  banana1->setPosition(1.3,0.13,0.2);
+  banana2->setPosition(0.7,0.13,0.2);
+
+  world.setMaterialPairProp("glass","steel", 0.7,0.1,0.15);
+  world.setMaterialPairProp("steel","steel",0.015,0.1,0.15);
+
   auto atlas = world.addArticulatedSystem(modelname);
 
-  ROS_INFO("Parsing joint names.."); 
+  ROS_INFO("Parsing joint names..");
   ///Remove ROOT + universe joints names from the joint name vector get only the actuated joints
   std::vector<std::string> jnames = atlas->getMovableJointNames();
   auto itr = std::find(jnames.begin(), jnames.end(), "ROOT");
@@ -165,7 +202,7 @@ int main(int argc, char *argv[])
   cout << "Joint Names " << endl;
   for (int i = 0; i < jnames.size(); i++)
     cout << jnames[i] << endl;
-  
+
 
   Eigen::VectorXd jointNominalConfig(atlas->getGeneralizedCoordinateDim()), jointNominalVelocity(atlas->getDOF());
 
@@ -177,7 +214,7 @@ int main(int argc, char *argv[])
   ///Set Joint PD Gains
   Eigen::VectorXd jointPgain(atlas->getDOF()), jointDgain(atlas->getDOF());
   jointPgain.setConstant(jointPgain_);
-  jointDgain.setConstant(jointDgain_); 
+  jointDgain.setConstant(jointDgain_);
   //7 DOF ARMs
   // jointPgain[6 + l_arm_elx] = 100;
   // jointPgain[6 + r_arm_elx] = 100;
@@ -258,7 +295,7 @@ int main(int argc, char *argv[])
 
   atlas->printOutBodyNamesInOrder();
   atlas->printOutFrameNamesInOrder();
-  ROS_INFO("Launching RAISIM server.."); 
+  ROS_INFO("Launching RAISIM server..");
   /// launch raisim server
   raisim::RaisimServer server(&world);
   server.launchServer();
@@ -301,13 +338,12 @@ int main(int argc, char *argv[])
   baseLinearVelocity.setZero();
   bool initialized = false;
 
-  ROS_INFO("Initializing ROS publishers.."); 
-  // INIT ROS PUBLISHER 
+  ROS_INFO("Initializing ROS publishers..");
+  // INIT ROS PUBLISHER
   ros::Publisher joint_pub = n.advertise<sensor_msgs::JointState>("/atlas_raisim_ros/joint_states", 1000);
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("/atlas_raisim_ros/odom", 1000);
   ros::Publisher wrench_pub_LLeg = n.advertise<geometry_msgs::WrenchStamped>("/atlas_raisim_ros/LLeg/force_torque_states", 1000);
   ros::Publisher wrench_pub_RLeg = n.advertise<geometry_msgs::WrenchStamped>("/atlas_raisim_ros/RLeg/force_torque_states", 1000);
-  ros::Publisher gait_phase_pub = n.advertise<std_msgs::String>("/atlas_raisim_ros/gait_phase", 1000);
   ros::Publisher com_pub = n.advertise<nav_msgs::Odometry>("/atlas_raisim_ros/CoM", 1000);
   ros::Publisher odom_pub_LLeg = n.advertise<nav_msgs::Odometry>("/atlas_raisim_ros/LLeg/odom", 1000);
   ros::Publisher odom_pub_RLeg = n.advertise<nav_msgs::Odometry>("/atlas_raisim_ros/RLeg/odom", 1000);
@@ -317,8 +353,13 @@ int main(int argc, char *argv[])
   ros::Publisher zmp_pub = n.advertise<geometry_msgs::PointStamped>("/atlas_raisim_ros/ZMP", 1000);
   ros::Publisher LCOP_pub = n.advertise<geometry_msgs::PointStamped>("/atlas_raisim_ros/LLeg/COP", 1000);
   ros::Publisher RCOP_pub = n.advertise<geometry_msgs::PointStamped>("/atlas_raisim_ros/RLeg/COP", 1000);
+
+  ros::Publisher left_gait_phase_pub  = n.advertise<std_msgs::String>("/atlas_raisim_ros/LLeg/contact_status", 1000);
+  ros::Publisher right_gait_phase_pub = n.advertise<std_msgs::String>("/atlas_raisim_ros/RLeg/contact_status", 1000);
+  ros::Publisher gait_phase_pub = n.advertise<std_msgs::String>("/atlas_raisim_ros/gait_phase", 1000);
+
   ros::Subscriber command_js_sub = n.subscribe("/atlas_raisim_ros/command_joint_states", 1000, commandJointStatesCallback);
-  
+
   ros::Publisher imu_pub_LLeg = n.advertise<sensor_msgs::Imu>("/atlas_raisim_ros/LLeg/imu", 1000);
   ros::Publisher imu_pub_RLeg = n.advertise<sensor_msgs::Imu>("/atlas_raisim_ros/RLeg/imu", 1000);
   ros::Publisher imu_pub = n.advertise<sensor_msgs::Imu>("/atlas_raisim_ros/imu", 1000);
@@ -346,6 +387,8 @@ int main(int argc, char *argv[])
   Hodom_msg.child_frame_id = "neck_ry";
   geometry_msgs::WrenchStamped wrench_msg;
   wrench_msg.header.frame_id = "world";
+  std_msgs::String left_gait_msg;
+  std_msgs::String right_gait_msg;
   std_msgs::String gait_msg;
   nav_msgs::Odometry com_msg;
   com_msg.header.frame_id = "world";
@@ -360,11 +403,9 @@ int main(int argc, char *argv[])
 
 
   ros::Rate loop_rate(freq);
-  ROS_INFO("Entering main loop .."); 
-
+  ROS_INFO("Entering main loop ..");
   while (ros::ok())
   {
-
     atlas->getState(q, dq);
     /// Compute Base Linear Acceleration
     baseLinearVelocity_ = baseLinearVelocity;
@@ -471,9 +512,39 @@ int main(int argc, char *argv[])
       }
     }
 
+
+
+    // 2 gait phase publishers (1 for each foot)  MIXALIS
+    float stable_threshold{0.01};
+
+    if (LSS){
+      if (LfootLinearVelocity.norm() < stable_threshold){
+        left_gait_msg.data = "stable_contact";
+      }else{
+        left_gait_msg.data = "slip";
+      }
+    }else{
+      left_gait_msg.data = "no_contact";
+    }
+
+
+    if (RSS){
+      if (RfootLinearVelocity.norm() < stable_threshold){
+        right_gait_msg.data = "stable_contact";
+      }else{
+        right_gait_msg.data = "slip";
+      }
+    }else{
+       right_gait_msg.data = "no_contact";
+    }
+
+    left_gait_phase_pub.publish(left_gait_msg);
+    right_gait_phase_pub.publish(right_gait_msg);
+
+
     if (LSS && RSS)
     {
-      DS = true;
+      DS = true; // let it be so it doesnt affect step planner
       LSS = false;
       RSS = false;
     }
@@ -507,7 +578,7 @@ int main(int argc, char *argv[])
     }
     else
       ZMP.setZero();
-      
+
     //cout<<"COP L "<<COPL.transpose()<<" "<<LLeg_COP.transpose()<<endl;
     //cout<<"COP R "<<COPR.transpose()<<" "<<RLeg_COP.transpose()<<endl;
     raisim::Vec<3> linear_momentum = atlas->getLinearMomentum();
@@ -663,16 +734,19 @@ int main(int argc, char *argv[])
       wrench_msg.header.stamp = ros::Time::now();
       wrench_pub_RLeg.publish(wrench_msg);
 
-      // GAIT PHASE PUBLISHER
-      if (DS)
-        gait_msg.data = "double_support";
-      else if (LSS)
-        gait_msg.data = "left_support";
-      else if (RSS)
-        gait_msg.data = "right_support";
-      else
-        gait_msg.data = "flight";
 
+
+
+
+      if (DS){
+        gait_msg.data = "double_suport";
+      }else if (LSS){
+        gait_msg.data = "left_support";
+      }else if (RSS){
+        gait_msg.data = "right_support";
+      }else{
+        gait_msg.data = "flight";
+      }
       gait_phase_pub.publish(gait_msg);
 
       // CENTER OF MASS PUBLISHER
