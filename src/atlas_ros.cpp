@@ -739,7 +739,7 @@ int main(int argc, char *argv[])
 
 
       if (DS){
-        gait_msg.data = "double_suport";
+        gait_msg.data = "double_support";
       }else if (LSS){
         gait_msg.data = "left_support";
       }else if (RSS){
