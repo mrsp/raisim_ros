@@ -415,7 +415,8 @@ int main(int argc, char *argv[])
     atlas->getFramePosition(RfootFrameIndex, footPosition);
     atlas->getFrameOrientation(RfootFrameIndex, footOrientation);
     RfootPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
-    RfootOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
+    //RfootOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
+    RfootOrientation = footOrientation.e();
     Tir.translation() = RfootPosition;
     Tir.linear() = RfootOrientation;
     qir = Quaterniond(RfootOrientation);
@@ -432,7 +433,8 @@ int main(int argc, char *argv[])
     atlas->getFramePosition(LfootFrameIndex, footPosition);
     atlas->getFrameOrientation(LfootFrameIndex, footOrientation);
     LfootPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
-    LfootOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
+    //LfootOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
+    LfootOrientation = footOrientation.e();
     Til.translation() = LfootPosition;
     Til.linear() = LfootOrientation;
     qil = Quaterniond(LfootOrientation);
@@ -449,8 +451,8 @@ int main(int argc, char *argv[])
     atlas->getFramePosition(RHandFrameIndex, footPosition);
     atlas->getFrameOrientation(RHandFrameIndex, footOrientation);
     RHandPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
-    RHandOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
-
+    //RHandOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
+    RHandOrientation = footOrientation.e();
     TiRH.translation() = RHandPosition;
     TiRH.linear() = RHandOrientation;
     qiRH = Quaterniond(RHandOrientation);
@@ -458,8 +460,8 @@ int main(int argc, char *argv[])
     atlas->getFramePosition(LHandFrameIndex, footPosition);
     atlas->getFrameOrientation(LHandFrameIndex, footOrientation);
     LHandPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
-    LHandOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
-
+    //LHandOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
+    LHandOrientation = footOrientation.e();
     TiLH.translation() = LHandPosition;
     TiLH.linear() = LHandOrientation;
     qiLH = Quaterniond(LHandOrientation);
@@ -468,8 +470,8 @@ int main(int argc, char *argv[])
     atlas->getFramePosition(HeadFrameIndex, footPosition);
     atlas->getFrameOrientation(HeadFrameIndex, footOrientation);
     HeadPosition = Eigen::Vector3d(footPosition[0], footPosition[1], footPosition[2]);
-    HeadOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
-
+    //HeadOrientation << footOrientation[0], footOrientation[1], footOrientation[2], footOrientation[3], footOrientation[4], footOrientation[5], footOrientation[6], footOrientation[7], footOrientation[8];
+    HeadOrientation = footOrientation.e();
     TiH.translation() = HeadPosition;
     TiH.linear() = HeadOrientation;
     qiH = Quaterniond(HeadOrientation);
