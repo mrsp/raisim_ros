@@ -42,3 +42,6 @@ add_executable(nao_ros src/nao_ros.cpp )
 target_link_libraries(nao_ros PUBLIC raisim::raisim pthread ${EIGEN3_LIBRARIES} ${catkin_LIBRARIES} ${EIGEN3_LIBRARIES} ${Boost_LIBRARIES})
 add_executable(atlas_ros src/atlas_ros.cpp )
 target_link_libraries(atlas_ros PUBLIC raisim::raisim pthread ${EIGEN3_LIBRARIES} ${catkin_LIBRARIES} ${EIGEN3_LIBRARIES} ${Boost_LIBRARIES})
+add_executable(talos_ros src/talos_ros.cpp )
+target_link_libraries(talos_ros PUBLIC raisim::raisim pthread ${EIGEN3_LIBRARIES} ${catkin_LIBRARIES} ${EIGEN3_LIBRARIES} ${Boost_LIBRARIES})
+
