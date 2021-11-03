@@ -553,11 +553,11 @@ int main(int argc, char *argv[])
       sensor_msgs::JointStateConstPtr msg = joint_data.pop();
       std::vector<double> pos_vector = msg->position;
       double *pos_array = pos_vector.data();
-      jointNominalConfig = Eigen::Map<Eigen::Matrix<double, 36, 1>>(pos_array);
+      jointNominalConfig = Eigen::Map<Eigen::Matrix<double, 51, 1>>(pos_array);
 
       std::vector<double> vel_vector = msg->velocity;
       double *vel_array = vel_vector.data();
-      jointNominalVelocity = Eigen::Map<Eigen::Matrix<double, 35, 1>>(vel_array);
+      jointNominalVelocity = Eigen::Map<Eigen::Matrix<double, 50, 1>>(vel_array);
     }
     if (animation_mode)
     {
