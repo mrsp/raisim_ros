@@ -3,6 +3,9 @@
 #include <Eigen/Dense>
 #include <fstream>
 #include <iostream>
+#include <stdlib.h>
+#include <cmath>
+#include <random>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -141,31 +144,6 @@ int main(int argc, char *argv[])
 
   /* Mixalis scene generation for raisim simulation */
 
-  /*  Add height map to raisim. Dont forget to remove the "world.addGround", Otherwise u will have both.
-
-  raisim::TerrainProperties terrainProperties;
-  terrainProperties.frequency = 0.2;
-  terrainProperties.zScale = -0.2;
-  terrainProperties.xSize = 40.0;
-  terrainProperties.ySize = 40.0;
-  terrainProperties.xSamples = 50;
-  terrainProperties.ySamples = 50;
-  terrainProperties.fractalOctaves = 3;
-  terrainProperties.fractalLacunarity = 2.0;
-  terrainProperties.fractalGain = 0.25;
-
-  // auto sphere = world.addSphere(0.1, 0.0);
-  auto hm = world.addHeightMap(0,0,terrainProperties);
-  */
-
-  // Add small stones in order to test contact detection
-  // int number_of_stones{100};
-  // for (int i = 0 ; i < number_of_stones ;++i){
-  //   auto stone_i = world.addSphere(0.001,1,"steel");
-  //   stone_i->setPosition(i/5.+0.1,0.1*std::pow(-1,i),0.5);
-  // }
-
-
   ROS_INFO("Populating world..");
   world.setTimeStep(dt);
   world.setERP(0, 0);
@@ -177,11 +155,32 @@ int main(int argc, char *argv[])
 
   ///create objects
   auto ground = world.addGround(0.0 ,"glass");
-  auto banana1= world.addBox(0.3,0.15,0.001,10.,"steel");
-  auto banana2= world.addBox(0.3,0.15,0.001,10.,"steel");
 
-  banana1->setPosition(1.3,0.13,0.2);
-  banana2->setPosition(0.7,0.13,0.2);
+  const int num_bananas{100};
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> dis(-0.3, 0.3);
+  float x_banana_pos{0.}, y_banana_pos{0.};
+  for (int i = 1 ; i < 20 ; ++i){
+    for (int j  =-3; j < 3 ; ++j){
+      x_banana_pos = i + dis(gen);
+      y_banana_pos = j + dis(gen);
+
+      auto banana = world.addBox(0.3,0.15,0.001,100.,"steel");
+      banana->setPosition(x_banana_pos, y_banana_pos, 0.2);
+      auto banana1 = world.addBox(0.3,0.15,0.001,100.,"steel");
+      banana1->setPosition(x_banana_pos, y_banana_pos+0.2,0.2);
+      auto banana2 = world.addBox(0.3,0.15,0.001,100.,"steel");
+      banana2->setPosition(x_banana_pos, y_banana_pos-0.2,0.2);
+    }
+  }
+
+  // auto banana1= world.addBox(0.3,0.15,0.001,10.,"steel");
+  // auto banana2= world.addBox(0.3,0.15,0.001,10.,"steel");
+  //
+  // banana1->setPosition(1.3,0.13,0.2);
+  // banana2->setPosition(0.7,0.13,0.2);
 
   world.setMaterialPairProp("glass","steel", 0.7,0.1,0.15);
   world.setMaterialPairProp("steel","steel",0.015,0.1,0.15);
