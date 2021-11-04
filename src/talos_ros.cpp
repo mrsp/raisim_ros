@@ -224,15 +224,15 @@ int main(int argc, char *argv[])
   ///Set Nominal Configuration
   jointNominalConfig.setZero();
   jointNominalVelocity.setZero();
-  jointNominalConfig << 0, 0, 1.02,1,0,0,0, 
+  jointNominalConfig << 0, 0, 1.0246,1,0,0,0, 
   0,0, 
   0, 0.0,
   0.25847, 0.173046, -0.0002, -0.525366, 0, 0, 0.1,
   0,0,0,0,0,0,0,
 -0.25847,  -0.173046, 0.0002, -0.525366, 0, 0, 0.1,
   0,0,0,0,0,0,0,
- 0.0, 0.000,  -0.4,  0.8, -0.4, 0, 
- 0.0, 0.00,  -0.4,  0.8, -0.4, 0;
+ 0.0, 0.05,  -0.4,  0.8, -0.4, -0.05, 
+ 0.0, -0.05,  -0.4,  0.8, -0.4, 0.05;
 
   ///Set Joint PD Gains
   Eigen::VectorXd jointPgain(talos->getDOF()), jointDgain(talos->getDOF());

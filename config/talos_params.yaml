@@ -2,5 +2,5 @@ modelname: "../rsc/talos/talos_full_v2.urdf"
 activation_key: "../share/raisim/activation.raisim"
 enable_gravity: True
 animation_mode: False
-jointPgain: 16000.0
-jointDgain: 1750.0
+jointPgain: 8000.0
+jointDgain: 750.0
