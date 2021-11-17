@@ -218,7 +218,10 @@ int main(int argc, char *argv[])
   for (int i = 0; i < jnames.size(); i++)
     cout << jnames[i] << endl;
 
-
+  cout<<"Body Names"<<endl;
+  talos->printOutBodyNamesInOrder();
+  cout<<"Frame Names"<<endl;
+  talos->printOutFrameNamesInOrder();
   Eigen::VectorXd jointNominalConfig(talos->getGeneralizedCoordinateDim()), jointNominalVelocity(talos->getDOF());
 
   ///Set Nominal Configuration
@@ -248,8 +251,6 @@ int main(int argc, char *argv[])
   talos->setPdGains(jointPgain, jointDgain);
   talos->setName("talos");
 
-  talos->printOutBodyNamesInOrder();
-  talos->printOutFrameNamesInOrder();
   ROS_INFO("Launching RAISIM server..");
   /// launch raisim server
   raisim::RaisimServer server(&world);
@@ -271,8 +272,8 @@ int main(int argc, char *argv[])
   bool firstCoMVel = true;
 
   /// For Contact Detection, COP, GRF and GRT computation
-  auto RfootIndex = talos->getBodyIdx(rfoot_frame);
-  auto LfootIndex = talos->getBodyIdx(lfoot_frame);
+  auto RfootIndex = talos->getBodyIdx("leg_right_5_link");
+  auto LfootIndex = talos->getBodyIdx("leg_left_5_link");
 
   auto RfootFrameIndex = talos->getFrameIdxByName("leg_right_sole_fix_joint");
   auto LfootFrameIndex = talos->getFrameIdxByName("leg_left_sole_fix_joint");

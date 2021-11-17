@@ -3,4 +3,4 @@ activation_key: "../share/raisim/activation.raisim"
 enable_gravity: True
 animation_mode: False
 jointPgain: 8000.0
-jointDgain: 750.0
+jointDgain: 700.0
