@@ -44,4 +44,5 @@ add_executable(atlas_ros src/atlas_ros.cpp )
 target_link_libraries(atlas_ros PUBLIC raisim::raisim pthread ${EIGEN3_LIBRARIES} ${catkin_LIBRARIES} ${EIGEN3_LIBRARIES} ${Boost_LIBRARIES})
 add_executable(talos_ros src/talos_ros.cpp )
 target_link_libraries(talos_ros PUBLIC raisim::raisim pthread ${EIGEN3_LIBRARIES} ${catkin_LIBRARIES} ${EIGEN3_LIBRARIES} ${Boost_LIBRARIES})
-
+add_executable(morphLynX_ros src/morphLynX_ros.cpp )
+target_link_libraries(morphLynX_ros PUBLIC raisim::raisim pthread ${EIGEN3_LIBRARIES} ${catkin_LIBRARIES} ${EIGEN3_LIBRARIES} ${Boost_LIBRARIES})

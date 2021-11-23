@@ -1,0 +1,2290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-1-g15f4949  Build Version: 1.6.7594.29634
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="morphlynx">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.000276598725650778 -0.000310224911284039 0.00148418621995441"
+        rpy="0 0 0" />
+      <mass
+        value="0.0191012536604614" />
+      <inertia
+        ixx="8.08993467976212E-06"
+        ixy="4.57728253329319E-09"
+        ixz="-1.21803359504819E-08"
+        iyy="1.71771116325382E-05"
+        iyz="3.35403185901994E-10"
+        izz="2.51810305583357E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/base_link.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/base_link.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="SC-FRONT-CAPLING">
+    <inertial>
+      <origin
+        xyz="-4.62149394982042E-05 1.24145034530176E-11 0.00584718627496306"
+        rpy="0 0 0" />
+      <mass
+        value="0.00388168562397068" />
+      <inertia
+        ixx="3.09363338665308E-07"
+        ixy="-1.57576096613376E-16"
+        ixz="-1.22062502891151E-09"
+        iyy="5.16127047137718E-07"
+        iyz="-6.18283292074338E-17"
+        izz="4.87639162474153E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/SC-FRONT-CAPLING.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/SC-FRONT-CAPLING.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="SC-FRONT-CAPLING"
+    type="fixed">
+    <origin
+      xyz="0.0473016965914241 0.0101948709329004 0.0122706259703034"
+      rpy="1.57079632893312 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="SC-FRONT-CAPLING" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="SERVO-FRONT-CAPLING-PITCH">
+    <inertial>
+      <origin
+        xyz="-0.000384508499174051 0.0126027787718828 1.09534353809337E-10"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519223665197" />
+      <inertia
+        ixx="4.42030047813646E-07"
+        ixy="3.31941458815829E-08"
+        ixz="-9.76955634209418E-14"
+        iyy="4.05343652024244E-07"
+        iyz="-6.61707472782017E-15"
+        izz="6.84998310264265E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/SERVO-FRONT-CAPLING-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/SERVO-FRONT-CAPLING-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="SERVO-FRONT-CAPLING-PITCH"
+    type="fixed">
+    <origin
+      xyz="0 0 0.000999999999999342"
+      rpy="1.57079632893312 0 -3.14159265284031" />
+    <parent
+      link="SC-FRONT-CAPLING" />
+    <child
+      link="SERVO-FRONT-CAPLING-PITCH" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FRONT-CAPLING">
+    <inertial>
+      <origin
+        xyz="0.00932469362706763 -0.0114999999999999 -5.34711164235091E-14"
+        rpy="0 0 0" />
+      <mass
+        value="0.00270228717508013" />
+      <inertia
+        ixx="6.13949611396249E-07"
+        ixy="-1.94829705237611E-22"
+        ixz="-4.53642987309235E-23"
+        iyy="2.03802701162908E-07"
+        iyz="-1.77107123965846E-22"
+        izz="6.27041981381177E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/FRONT-CAPLING.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/FRONT-CAPLING.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="CAPLING-F-PITCH"
+    type="continuous">
+    <origin
+      xyz="-0.00525000000000003 0 0"
+      rpy="0 0.00182717944915082 -3.14159265358979" />
+    <parent
+      link="SERVO-FRONT-CAPLING-PITCH" />
+    <child
+      link="FRONT-CAPLING" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="SC-REAR-CAPLING">
+    <inertial>
+      <origin
+        xyz="-4.62080969305736E-05 -5.34502997417974E-14 0.00584718632905018"
+        rpy="0 0 0" />
+      <mass
+        value="0.00388168562397068" />
+      <inertia
+        ixx="3.09363335808726E-07"
+        ixy="6.85008944770476E-25"
+        ixz="-1.22041640500412E-09"
+        iyy="5.16127047137719E-07"
+        iyz="-8.91287110025887E-23"
+        izz="4.87639165330736E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/SC-REAR-CAPLING.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/SC-REAR-CAPLING.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="SC-REAR-CAPLING"
+    type="fixed">
+    <origin
+      xyz="-0.0371983034085759 0.00494487093290037 0.0122706259703034"
+      rpy="1.5707963267949 0 -1.57079632679489" />
+    <parent
+      link="base_link" />
+    <child
+      link="SC-REAR-CAPLING" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="SERVO-REAR-CAPLING-ROLL">
+    <inertial>
+      <origin
+        xyz="-0.000384508493883707 0.0136027787675984 1.12530054718896E-10"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519223468016" />
+      <inertia
+        ixx="4.42030047439535E-07"
+        ixy="3.31941455257412E-08"
+        ixz="-9.74632742485599E-14"
+        iyy="4.05343651743622E-07"
+        iyz="-7.02790507590519E-15"
+        izz="6.84998309711999E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/SERVO-REAR-CAPLING-ROLL.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/SERVO-REAR-CAPLING-ROLL.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="SERVO-REAR-CAPLING-ROLL"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="1.5707963267949 0 3.14159265358979" />
+    <parent
+      link="SC-REAR-CAPLING" />
+    <child
+      link="SERVO-REAR-CAPLING-ROLL" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="REAR-CAPLING">
+    <inertial>
+      <origin
+        xyz="-0.0020249449152616 -5.34607080826532E-14 -0.00801176510310647"
+        rpy="0 0 0" />
+      <mass
+        value="0.00787132522957532" />
+      <inertia
+        ixx="5.83100326597713E-07"
+        ixy="1.78102325640324E-23"
+        ixz="1.07505724926403E-09"
+        iyy="1.18904229209336E-06"
+        iyz="1.8032537353656E-22"
+        izz="1.26739941933807E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/REAR-CAPLING.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/REAR-CAPLING.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="CAPLING-REAR-ROLL"
+    type="continuous">
+    <origin
+      xyz="-0.00525000000000003 0.0277634565073713 0"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="SERVO-REAR-CAPLING-ROLL" />
+    <child
+      link="REAR-CAPLING" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="CAMERA-R">
+    <inertial>
+      <origin
+        xyz="-1.45716771982052E-16 -0.00225514045541008 0.0054882376767566"
+        rpy="0 0 0" />
+      <mass
+        value="0.00441438219440412" />
+      <inertia
+        ixx="2.33951250927226E-07"
+        ixy="5.26681405648998E-23"
+        ixz="2.02132669644039E-24"
+        iyy="4.66886059749415E-07"
+        iyz="-3.66679901899329E-10"
+        izz="3.63002720224577E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/CAMERA-R.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/CAMERA-R.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="CAMERA-R"
+    type="fixed">
+    <origin
+      xyz="0.0101016965914242 -0.0383051290670996 0.0122706259703034"
+      rpy="1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="CAMERA-R" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="CAMERA-L">
+    <inertial>
+      <origin
+        xyz="2.77555756156289E-17 -0.0022551402312316 0.00548824185136425"
+        rpy="0 0 0" />
+      <mass
+        value="0.00441437949542467" />
+      <inertia
+        ixx="2.33951115754024E-07"
+        ixy="8.21622992812437E-23"
+        ixz="6.04851336686903E-23"
+        iyy="4.66885921588399E-07"
+        iyz="-3.66672030530702E-10"
+        izz="3.630027148791E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/CAMERA-L.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/CAMERA-L.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="CAMERA-L"
+    type="fixed">
+    <origin
+      xyz="0.0101016965914243 0.0376948709329006 0.0122706259703034"
+      rpy="1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="CAMERA-L" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="CONTROL-BOX">
+    <inertial>
+      <origin
+        xyz="1.19348975147204E-14 7.63278329429795E-17 0.00999094259168056"
+        rpy="0 0 0" />
+      <mass
+        value="0.0537914675196552" />
+      <inertia
+        ixx="1.08257277154903E-05"
+        ixy="-2.8556778905388E-21"
+        ixz="-7.47771273747937E-22"
+        iyy="1.78698396830791E-05"
+        iyz="-8.12291361527073E-22"
+        izz="2.51183318462632E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/CONTROL-BOX.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/CONTROL-BOX.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="CONTROL-BOX"
+    type="fixed">
+    <origin
+      xyz="-0.00194830340857396 -0.000305129067099431 0.00397062597030342"
+      rpy="0 0 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="CONTROL-BOX" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="R-SC-HIP-ROLL">
+    <inertial>
+      <origin
+        xyz="-4.62080969304054E-05 -5.34594070400463E-14 0.00584718632905018"
+        rpy="0 0 0" />
+      <mass
+        value="0.00388168562397067" />
+      <inertia
+        ixx="3.09363335808725E-07"
+        ixy="-2.34712498811922E-23"
+        ixz="-1.22041640500414E-09"
+        iyy="5.16127047137717E-07"
+        iyz="1.58715280033612E-23"
+        izz="4.87639165330735E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SC-HIP-ROLL.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SC-HIP-ROLL.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-SC-HIP-ROLL"
+    type="fixed">
+    <origin
+      xyz="0.0101016965914242 -0.0383051290670996 -0.00932937402969657"
+      rpy="1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="R-SC-HIP-ROLL" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="R-SERVO-HIP-ROLL">
+    <inertial>
+      <origin
+        xyz="-0.000384508500723428 0.0136027787899434 1.36590211146856E-10"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519225368301" />
+      <inertia
+        ixx="4.42030049124117E-07"
+        ixy="3.31941459283633E-08"
+        ixz="-9.69608556129376E-14"
+        iyy="4.05343652312809E-07"
+        iyz="-8.46236558135027E-15"
+        izz="6.84998311194733E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SERVO-HIP-ROLL.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SERVO-HIP-ROLL.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-SERVO-HIP-ROLL"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="1.5707963267949 0 3.14159265358979" />
+    <parent
+      link="R-SC-HIP-ROLL" />
+    <child
+      link="R-SERVO-HIP-ROLL" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="R-SC-HIP-PITCH">
+    <inertial>
+      <origin
+        xyz="0.00545379190312563 -0.00835938318636968 -0.00595281367095868"
+        rpy="0 0 0" />
+      <mass
+        value="0.00388168562397068" />
+      <inertia
+        ixx="3.09363335808726E-07"
+        ixy="-1.40739094359186E-20"
+        ixz="-1.22041640500274E-09"
+        iyy="5.16127047137718E-07"
+        iyz="-5.73904891354935E-23"
+        izz="4.87639165330736E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SC-HIP-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SC-HIP-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-HIP-ROLL"
+    type="continuous">
+    <origin
+      xyz="-0.00525000000000002 0.0287406168136401 0"
+      rpy="0 1.57037041570975 3.14159265343196" />
+    <parent
+      link="R-SERVO-HIP-ROLL" />
+    <child
+      link="R-SC-HIP-PITCH" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="R-SERVO-HIP-PITCH">
+    <inertial>
+      <origin
+        xyz="-0.000384508489833684 0.012602778745886 1.11342046693608E-10"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519221509346" />
+      <inertia
+        ixx="4.42030045808581E-07"
+        ixy="3.31941453056553E-08"
+        ixz="-9.75840787628773E-14"
+        iyy="4.05343651348611E-07"
+        iyz="-6.68080359288394E-15"
+        izz="6.84998308501766E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SERVO-HIP-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SERVO-HIP-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-SERVO-HIP-PITCH"
+    type="fixed">
+    <origin
+      xyz="0.00550000000000046 -0.00835938318635776 -0.0108"
+      rpy="1.5707963267949 0 -3.14159265358979" />
+    <parent
+      link="R-SC-HIP-PITCH" />
+    <child
+      link="R-SERVO-HIP-PITCH" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="R-LINK-HIP-ANKLE">
+    <inertial>
+      <origin
+        xyz="0.035500000000035 -0.0115 -4.44783099240453E-14"
+        rpy="0 0 0" />
+      <mass
+        value="0.0128808114115962" />
+      <inertia
+        ixx="2.7990680763248E-06"
+        ixy="1.10635406928967E-23"
+        ixz="1.05879118406788E-22"
+        iyy="4.16552090795131E-06"
+        iyz="3.58582795541737E-22"
+        izz="6.28781585284836E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-LINK-HIP-ANKLE.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-LINK-HIP-ANKLE.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-HIP-PITCH"
+    type="continuous">
+    <origin
+      xyz="-0.00525000000000002 0 0"
+      rpy="0 -0.682710826909779 -3.14159265358979" />
+    <parent
+      link="R-SERVO-HIP-PITCH" />
+    <child
+      link="R-LINK-HIP-ANKLE" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="R-SERVO-ANKLE-PITCH">
+    <inertial>
+      <origin
+        xyz="0.00486549150549181 0.0126027787614641 9.52491696626367E-11"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519222711768" />
+      <inertia
+        ixx="4.42030047036578E-07"
+        ixy="3.31941456210219E-08"
+        ixz="-9.79984194611426E-14"
+        iyy="4.05343651695148E-07"
+        iyz="-5.81399200241297E-15"
+        izz="6.84998309564881E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SERVO-ANKLE-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SERVO-ANKLE-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-ANKLE-PITCH"
+    type="continuous">
+    <origin
+      xyz="0.071 0 0"
+      rpy="0 0.847129999047614 3.14159265358979" />
+    <parent
+      link="R-LINK-HIP-ANKLE" />
+    <child
+      link="R-SERVO-ANKLE-PITCH" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="R-LINK-ANKLE-TIBIA">
+    <inertial>
+      <origin
+        xyz="0.0385000456796759 1.72533734521529E-09 0.00599839401111354"
+        rpy="0 0 0" />
+      <mass
+        value="0.0169515393948695" />
+      <inertia
+        ixx="1.27646378050448E-06"
+        ixy="2.20435857879973E-14"
+        ixz="1.01851493716066E-10"
+        iyy="1.4737629444282E-05"
+        iyz="-2.57236311597374E-14"
+        izz="1.46513437089113E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-LINK-ANKLE-TIBIA.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-LINK-ANKLE-TIBIA.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-LINK-ANKLE-TIBIA"
+    type="fixed">
+    <origin
+      xyz="0.08225 -0.00100000000000051 0"
+      rpy="1.57079662491445 0 3.14158503845648" />
+    <parent
+      link="R-SERVO-ANKLE-PITCH" />
+    <child
+      link="R-LINK-ANKLE-TIBIA" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="R-SERVO-TIBIA-PITCH">
+    <inertial>
+      <origin
+        xyz="-0.000384412539514517 0.0126027817185584 -3.67305397208639E-09"
+        rpy="0 0 0" />
+      <mass
+        value="0.0069151922515927" />
+      <inertia
+        ixx="4.42030554832196E-07"
+        ixy="3.31938672607931E-08"
+        ixz="-1.08793025558777E-13"
+        iyy="4.05343147272634E-07"
+        iyz="7.82553027588661E-14"
+        izz="6.84998311941077E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SERVO-TIBIA-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SERVO-TIBIA-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-SERVO-TIBIA-PITCH"
+    type="fixed">
+    <origin
+      xyz="0 0 0.000999999999970969"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="R-LINK-ANKLE-TIBIA" />
+    <child
+      link="R-SERVO-TIBIA-PITCH" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="R-LINK-TIBIA-FOOT">
+    <inertial>
+      <origin
+        xyz="-0.036440334722229 -0.00658934273175115 1.75109626689984E-05"
+        rpy="0 0 0" />
+      <mass
+        value="0.00862384221571942" />
+      <inertia
+        ixx="1.56482853918435E-06"
+        ixy="-9.25199440592379E-09"
+        ixz="2.38005169919624E-09"
+        iyy="4.04460133877994E-06"
+        iyz="6.61009493684119E-10"
+        izz="5.13010743226958E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-LINK-TIBIA-FOOT.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-LINK-TIBIA-FOOT.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-TIBIA-PITCH"
+    type="continuous">
+    <origin
+      xyz="-0.00524999999984774 0 0"
+      rpy="0 0.905588919817454 3.14158541847693" />
+    <parent
+      link="R-SERVO-TIBIA-PITCH" />
+    <child
+      link="R-LINK-TIBIA-FOOT" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="R-SUCTION">
+    <inertial>
+      <origin
+        xyz="0.00177636755802124 -0.004257095358309 0.0181015800168966"
+        rpy="0 0 0" />
+      <mass
+        value="0.00729393817608512" />
+      <inertia
+        ixx="6.5311296097796E-07"
+        ixy="8.63491955921098E-08"
+        ixz="-1.27827788436877E-08"
+        iyy="4.82207015457807E-07"
+        iyz="3.06341634635897E-08"
+        izz="4.12017302214089E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SUCTION.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.317647058823529 0.247058823529412 0.207843137254902 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SUCTION.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-SUCTION"
+    type="fixed">
+    <origin
+      xyz="-0.0275 0 0"
+      rpy="-1.5707963267949 1.17548937506612 -3.14159265358979" />
+    <parent
+      link="R-LINK-TIBIA-FOOT" />
+    <child
+      link="R-SUCTION" />
+    <axis
+      xyz="0.222568073751166 -0.0527290822480012 -0.973490162473139" />
+  </joint>
+  <link
+    name="R-SERVO-FOOT-PITCH">
+    <inertial>
+      <origin
+        xyz="0.00486549148055718 0.0126027788121196 7.95549737198087E-11"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519226968711" />
+      <inertia
+        ixx="4.42030050887853E-07"
+        ixy="3.31941471160505E-08"
+        ixz="-9.84174553951765E-14"
+        iyy="4.0534365342949E-07"
+        iyz="-4.87842838613591E-15"
+        izz="6.84998313417764E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SERVO-FOOT-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SERVO-FOOT-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-FOOT-PITCH"
+    type="continuous">
+    <origin
+      xyz="-0.0709999999999994 0 0"
+      rpy="0 0.434750190990365 -3.14159265358979" />
+    <parent
+      link="R-LINK-TIBIA-FOOT" />
+    <child
+      link="R-SERVO-FOOT-PITCH" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="R-SC-FOOT-PITCH">
+    <inertial>
+      <origin
+        xyz="-0.00639750117186853 -1.79568832026078E-10 0.0117823559031306"
+        rpy="0 0 0" />
+      <mass
+        value="0.00307410333491138" />
+      <inertia
+        ixx="1.08655905725049E-07"
+        ixy="8.15339711343255E-15"
+        ixz="1.20338458275506E-09"
+        iyy="5.74904927195726E-07"
+        iyz="2.61033209565254E-16"
+        izz="6.4137099021085E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SC-FOOT-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SC-FOOT-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-SC-FOOT-PITCH"
+    type="fixed">
+    <origin
+      xyz="0.00525000000000084 0.0101259142521418 0"
+      rpy="1.5707963267949 0 -3.14159265358979" />
+    <parent
+      link="R-SERVO-FOOT-PITCH" />
+    <child
+      link="R-SC-FOOT-PITCH" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="R-SC2-FOOT-PITCH">
+    <inertial>
+      <origin
+        xyz="-0.00575567248423612 -5.32907051820075E-14 0.00593861362285812"
+        rpy="0 0 0" />
+      <mass
+        value="0.00563001173416683" />
+      <inertia
+        ixx="4.10832626497924E-07"
+        ixy="-1.45583787809333E-22"
+        ixz="9.16102996573953E-09"
+        iyy="9.89611620976255E-07"
+        iyz="6.38350788343657E-23"
+        izz="9.41329800063615E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SC2-FOOT-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SC2-FOOT-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-SC2-FOOT-PITCH"
+    type="fixed">
+    <origin
+      xyz="0.00525000000000038 -0.000999999999999455 0"
+      rpy="1.5707963267949 0 -3.14159265358979" />
+    <parent
+      link="R-SERVO-FOOT-PITCH" />
+    <child
+      link="R-SC2-FOOT-PITCH" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="R-SERVO-FOOT-ROLL">
+    <inertial>
+      <origin
+        xyz="0.00486549040658242 -0.010099181121255 1.40124495340288E-10"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519439197485" />
+      <inertia
+        ixx="4.42030128446499E-07"
+        ixy="3.31941870430998E-08"
+        ixz="-1.09860137239912E-13"
+        iyy="4.05343732368213E-07"
+        iyz="-6.26275678884374E-15"
+        izz="6.84998380833103E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SERVO-FOOT-ROLL.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SERVO-FOOT-ROLL.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-FOOT-ROLL"
+    type="continuous">
+    <origin
+      xyz="-0.028348 0 0.0065"
+      rpy="0 -1.5706 -1.5708" />
+    <parent
+      link="R-SC2-FOOT-PITCH" />
+    <child
+      link="R-SERVO-FOOT-ROLL" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.82"
+      upper="6.82"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="R-FOOT">
+    <inertial>
+      <origin
+        xyz="-1.9595603973601E-05 -0.0044418124757454 0.00135270410961713"
+        rpy="0 0 0" />
+      <mass
+        value="0.00920518301651195" />
+      <inertia
+        ixx="1.05680978933748E-06"
+        ixy="7.90531183375168E-10"
+        ixz="-4.19159605553091E-10"
+        iyy="1.27882439311496E-06"
+        iyz="4.00295489659523E-08"
+        izz="1.03165986822853E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-FOOT.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.858823529411765 0.858823529411765 0.858823529411765 0.1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-FOOT.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-FOOT"
+    type="fixed">
+    <origin
+      xyz="0.00525000000000043 -0.0237019612288466 0"
+      rpy="-1.5707963267949 0 0" />
+    <parent
+      link="R-SERVO-FOOT-ROLL" />
+    <child
+      link="R-FOOT" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="R-SUCTIONCUP">
+    <inertial>
+      <origin
+        xyz="4.23272528138341E-16 7.91727794435815E-15 0.000500000000065448"
+        rpy="0 0 0" />
+      <mass
+        value="0.000547101592653591" />
+      <inertia
+        ixx="3.78528310393959E-08"
+        ixy="-1.64022929967899E-24"
+        ixz="-2.07182894050391E-23"
+        iyy="1.64561539334398E-08"
+        iyz="2.37248970612133E-23"
+        izz="5.42178013740601E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SUCTIONCUP.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/R-SUCTIONCUP.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="R-SUCTIONCUP"
+    type="fixed">
+    <origin
+      xyz="0 -0.0116636317567742 -0.00454575689710258"
+      rpy="1.06026723948583 0 -3.14159265358979" />
+    <parent
+      link="R-FOOT" />
+    <child
+      link="R-SUCTIONCUP" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="L-SC-HIP-ROLL">
+    <inertial>
+      <origin
+        xyz="-4.62080969305806E-05 -5.34568049548323E-14 0.0058471863290502"
+        rpy="0 0 0" />
+      <mass
+        value="0.00388168562397067" />
+      <inertia
+        ixx="3.09363335808725E-07"
+        ixy="-4.79764755280756E-23"
+        ixz="-1.22041640500428E-09"
+        iyy="5.16127047137718E-07"
+        iyz="-3.7016332411748E-23"
+        izz="4.87639165330735E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SC-HIP-ROLL.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SC-HIP-ROLL.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-SC-HIP-ROLL"
+    type="fixed">
+    <origin
+      xyz="0.0101016965914241 0.0376948709329004 -0.00932937402969658"
+      rpy="1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="L-SC-HIP-ROLL" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="L-SERVO-HIP-ROLL">
+    <inertial>
+      <origin
+        xyz="-0.000384508494874203 0.013602778762246 8.14990189050568E-11"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519223021259" />
+      <inertia
+        ixx="4.42030047026508E-07"
+        ixy="3.3194145584039E-08"
+        ixz="-9.84214239962041E-14"
+        iyy="4.05343651751079E-07"
+        iyz="-4.86545093969248E-15"
+        izz="6.84998309497845E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SERVO-HIP-ROLL.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SERVO-HIP-ROLL.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-SERVO-HIP-ROLL"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="L-SC-HIP-ROLL" />
+    <child
+      link="L-SERVO-HIP-ROLL" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="L-SC-HIP-PITCH">
+    <inertial>
+      <origin
+        xyz="0.00545379190312295 0.00835951767072539 -0.00595281367095842"
+        rpy="0 0 0" />
+      <mass
+        value="0.00388168562397067" />
+      <inertia
+        ixx="3.09363335808725E-07"
+        ixy="2.71584074616473E-21"
+        ixz="-1.22041640499924E-09"
+        iyy="5.16127047137718E-07"
+        iyz="-5.61869903167138E-23"
+        izz="4.87639165330736E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SC-HIP-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SC-HIP-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-HIP-ROLL"
+    type="continuous">
+    <origin
+      xyz="-0.00525000000000005 0.0287404823292834 0"
+      rpy="0 -1.56636539875366 0" />
+    <parent
+      link="L-SERVO-HIP-ROLL" />
+    <child
+      link="L-SC-HIP-PITCH" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="L-SERVO-HIP-PITCH">
+    <inertial>
+      <origin
+        xyz="-0.000384508525577869 0.0126027788170145 1.32189897916746E-10"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519229473392" />
+      <inertia
+        ixx="4.42030050752032E-07"
+        ixy="3.31941469136977E-08"
+        ixz="-9.74210434773973E-14"
+        iyy="4.05343653954984E-07"
+        iyz="-8.11370519360995E-15"
+        izz="6.84998312743488E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SERVO-HIP-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SERVO-HIP-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-SERVO-HIP-PITCH"
+    type="fixed">
+    <origin
+      xyz="0.00549999999999979 0.00835951767071465 -0.0108000000000001"
+      rpy="1.5707963267949 0 3.14159265358979" />
+    <parent
+      link="L-SC-HIP-PITCH" />
+    <child
+      link="L-SERVO-HIP-PITCH" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="L-LINK-HIP-ANKLE">
+    <inertial>
+      <origin
+        xyz="0.0355000000000348 0.0115000000000004 -4.19941859064465E-14"
+        rpy="0 0 0" />
+      <mass
+        value="0.0128808114115962" />
+      <inertia
+        ixx="2.7990680763248E-06"
+        ixy="3.39392205330507E-21"
+        ixz="3.28225267061041E-21"
+        iyy="4.16552090795132E-06"
+        iyz="-2.06795153138257E-23"
+        izz="6.28781585284837E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-LINK-HIP-ANKLE.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-LINK-HIP-ANKLE.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-HIP-PITCH"
+    type="continuous">
+    <origin
+      xyz="-0.00525000000000002 0 0"
+      rpy="3.14159265358979 0.681350509840055 -3.14159265358977" />
+    <parent
+      link="L-SERVO-HIP-PITCH" />
+    <child
+      link="L-LINK-HIP-ANKLE" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="L-SERVO-ANKLE">
+    <inertial>
+      <origin
+        xyz="0.00486549148013194 0.0126027788102404 9.99806765156208E-11"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519227454494" />
+      <inertia
+        ixx="4.42030050605625E-07"
+        ixy="3.31941469870011E-08"
+        ixz="-9.78211796119115E-14"
+        iyy="4.05343653501535E-07"
+        iyz="-6.02343662110199E-15"
+        izz="6.84998312957783E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SERVO-ANKLE.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SERVO-ANKLE.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-ANKLE-PITCH"
+    type="continuous">
+    <origin
+      xyz="0.0710000000000028 0 0"
+      rpy="-3.14159265358979 0.849897180784238 -3.14159265358979" />
+    <parent
+      link="L-LINK-HIP-ANKLE" />
+    <child
+      link="L-SERVO-ANKLE" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="L-LINK-ANKLE-TIBIA">
+    <inertial>
+      <origin
+        xyz="0.0384999999999938 5.61495294704173E-14 0.0059986871939201"
+        rpy="0 0 0" />
+      <mass
+        value="0.0169515393948695" />
+      <inertia
+        ixx="1.27646377972887E-06"
+        ixy="1.96438851869093E-20"
+        ixz="5.97215354975336E-21"
+        iyy="1.4737629444282E-05"
+        iyz="-4.46677530778635E-22"
+        izz="1.46513437096869E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-LINK-ANKLE-TIBIA.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-LINK-ANKLE-TIBIA.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-LINK-ANKLE-TIBIA"
+    type="fixed">
+    <origin
+      xyz="0.0822500000000028 -0.000999999999999994 0"
+      rpy="1.5707963267949 0 3.14159265358979" />
+    <parent
+      link="L-SERVO-ANKLE" />
+    <child
+      link="L-LINK-ANKLE-TIBIA" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="L-SERVO-TIBIA-PITCH">
+    <inertial>
+      <origin
+        xyz="-0.000384508500810704 0.013602778780214 9.33607496866884E-11"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519224904657" />
+      <inertia
+        ixx="4.42030048307756E-07"
+        ixy="3.31941458533899E-08"
+        ixz="-9.80658577461698E-14"
+        iyy="4.0534365226486E-07"
+        iyz="-5.76211242718809E-15"
+        izz="6.84998310489055E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SERVO-TIBIA-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SERVO-TIBIA-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-SERVO-TIBIA-PITCH"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="L-LINK-ANKLE-TIBIA" />
+    <child
+      link="L-SERVO-TIBIA-PITCH" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="L-LINK-TIBIA-FOOT">
+    <inertial>
+      <origin
+        xyz="-0.0364403347223291 0.0174106572682497 1.75109627411074E-05"
+        rpy="0 0 0" />
+      <mass
+        value="0.00862384221571942" />
+      <inertia
+        ixx="1.56482853918435E-06"
+        ixy="-9.25199440592549E-09"
+        ixz="2.38005169919555E-09"
+        iyy="4.04460133877995E-06"
+        iyz="6.61009493684128E-10"
+        izz="5.13010743226958E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-LINK-TIBIA-FOOT.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-LINK-TIBIA-FOOT.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-TIBIA-PITCH"
+    type="continuous">
+    <origin
+      xyz="-0.00525000000000064 0 0"
+      rpy="3.14159265358979 -0.90752625863371 -3.14159265358979" />
+    <parent
+      link="L-SERVO-TIBIA-PITCH" />
+    <child
+      link="L-LINK-TIBIA-FOOT" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="L-SUCTION">
+    <inertial>
+      <origin
+        xyz="-0.000637154589804068 0.0136984199504924 1.04279418433606E-10"
+        rpy="0 0 0" />
+      <mass
+        value="0.00729393815187005" />
+      <inertia
+        ixx="4.46175853908767E-07"
+        ixy="3.31941457115377E-08"
+        ixz="-9.76602949862014E-14"
+        iyy="4.12017300919133E-07"
+        iyz="-6.7333548857405E-15"
+        izz="6.89144116012422E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SUCTION.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SUCTION.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-SUCTION"
+    type="fixed">
+    <origin
+      xyz="-0.0327500000000009 -0.00780000000000004 0"
+      rpy="-3.14159265358979 0 -3.14159265358979" />
+    <parent
+      link="L-LINK-TIBIA-FOOT" />
+    <child
+      link="L-SUCTION" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="L-SERVO-FOOT-PITCH">
+    <inertial>
+      <origin
+        xyz="0.0048654914987234 0.0126025801899965 1.17862219983778E-10"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519224494518" />
+      <inertia
+        ixx="4.42030047610355E-07"
+        ixy="3.31941458468641E-08"
+        ixz="-9.74158672841823E-14"
+        iyy="4.05343652308659E-07"
+        iyz="-7.22846056823043E-15"
+        izz="6.84998310024146E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SERVO-FOOT-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SERVO-FOOT-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-FOOT-PITCH"
+    type="continuous">
+    <origin
+      xyz="-0.0710000000000005 0.00100019858208518 0"
+      rpy="-3.14159265358979 0.434718628423193 -3.14159265358979" />
+    <parent
+      link="L-LINK-TIBIA-FOOT" />
+    <child
+      link="L-SERVO-FOOT-PITCH" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="L-SC-FOOT-PITCH">
+    <inertial>
+      <origin
+        xyz="-0.00639750120468131 3.31084715199381E-10 0.0117823558977973"
+        rpy="0 0 0" />
+      <mass
+        value="0.00307410332929773" />
+      <inertia
+        ixx="1.086559058003E-07"
+        ixy="-1.62039105015099E-14"
+        ixz="1.20338482547612E-09"
+        iyy="5.74904925278161E-07"
+        iyz="8.71497681376224E-17"
+        izz="6.4137098841965E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SC-FOOT-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SC-FOOT-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-SC-FOOT-PITCH"
+    type="fixed">
+    <origin
+      xyz="0.00525000000000003 0.0104998014179148 0"
+      rpy="1.5707963267949 0 -3.14159265358979" />
+    <parent
+      link="L-SERVO-FOOT-PITCH" />
+    <child
+      link="L-SC-FOOT-PITCH" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="L-SC2-FOOT-PITCH">
+    <inertial>
+      <origin
+        xyz="-0.00575567248427487 0 0.00593861362285799"
+        rpy="0 0 0" />
+      <mass
+        value="0.00563001173416682" />
+      <inertia
+        ixx="4.10832626497923E-07"
+        ixy="6.61744490042422E-23"
+        ixz="9.16102996573999E-09"
+        iyy="9.89611620976254E-07"
+        iyz="-2.15583947146633E-22"
+        izz="9.41329800063614E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SC2-FOOT-PITCH.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SC2-FOOT-PITCH.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-SC2-FOOT-PITCH"
+    type="fixed">
+    <origin
+      xyz="0.00525000000002024 -0.00100019858208486 0"
+      rpy="1.5707963267949 0 -3.14159265358979" />
+    <parent
+      link="L-SERVO-FOOT-PITCH" />
+    <child
+      link="L-SC2-FOOT-PITCH" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="L-SERVO-FOOT-ROLL">
+    <inertial>
+      <origin
+        xyz="0.00486549045576727 -0.0100675053863047 1.41717304558142E-10"
+        rpy="0 0 0" />
+      <mass
+        value="0.00691519437134214" />
+      <inertia
+        ixx="4.42030126000761E-07"
+        ixy="3.31941841202142E-08"
+        ixz="-1.0781450882863E-13"
+        iyy="4.05343729718E-07"
+        iyz="-1.03364889038298E-14"
+        izz="6.84998376851316E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SERVO-FOOT-ROLL.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SERVO-FOOT-ROLL.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-FOOT-ROLL"
+    type="continuous">
+    <origin
+      xyz="-0.02838 0 0.0065"
+      rpy="-3.1416 -1.5675 1.5708" />
+    <parent
+      link="L-SC2-FOOT-PITCH" />
+    <child
+      link="L-SERVO-FOOT-ROLL" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-6.28"
+      upper="6.28"
+      effort="80"
+      velocity="15" />
+  </joint>
+  <link
+    name="L-FOOT">
+    <inertial>
+      <origin
+        xyz="-1.95958453468731E-05 -0.00444181247418957 0.00135270420107354"
+        rpy="0 0 0" />
+      <mass
+        value="0.00920518287932566" />
+      <inertia
+        ixx="1.05680977304839E-06"
+        ixy="7.90522173075187E-10"
+        ixz="-4.19163906498017E-10"
+        iyy="1.27882439310531E-06"
+        iyz="4.00295480729578E-08"
+        izz="1.03165986894221E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-FOOT.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.858823529411765 0.858823529411765 0.858823529411765 0.1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-FOOT.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-FOOT"
+    type="fixed">
+    <origin
+      xyz="0.00525000000000003 -0.0236702854642496 0"
+      rpy="1.57079632678999 0 3.14159265358979" />
+    <parent
+      link="L-SERVO-FOOT-ROLL" />
+    <child
+      link="L-FOOT" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="L-SUCTIONCUP">
+    <inertial>
+      <origin
+        xyz="1.66533453693773E-16 1.90266664923389E-09 0.000499999999938827"
+        rpy="0 0 0" />
+      <mass
+        value="0.000547101592653589" />
+      <inertia
+        ixx="3.78528310393958E-08"
+        ixy="-7.56570363919544E-23"
+        ixz="-9.42533533912962E-24"
+        iyy="1.64561539339865E-08"
+        iyz="1.43694970395145E-13"
+        izz="5.4217801373513E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SUCTIONCUP.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="meshes/L-SUCTIONCUP.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="L-SUCTIONCUP"
+    type="fixed">
+    <origin
+      xyz="0 -0.0116636317566972 -0.0045457568971396"
+      rpy="1.06027104479611 0 -3.14159265094917" />
+    <parent
+      link="L-FOOT" />
+    <child
+      link="L-SUCTIONCUP" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>
