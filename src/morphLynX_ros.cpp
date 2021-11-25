@@ -140,11 +140,11 @@ int main(int argc, char *argv[])
   morphLynX->printOutFrameNamesInOrder();
 
   Eigen::VectorXd jointNominalConfig(morphLynX->getGeneralizedCoordinateDim()), jointNominalVelocity(morphLynX->getDOF());
-
+  cout<<"Robot DOF"<<morphLynX->getGeneralizedCoordinateDim()-7<<endl;
   ///Set Nominal Configuration
   jointNominalConfig.setZero();
   jointNominalVelocity.setZero();
-  jointNominalConfig[2] = 0.166;
+  jointNominalConfig[2] = 0.168433660906;
   jointNominalConfig[3] = 1;
 
   ///Set Joint PD Gains
@@ -385,11 +385,11 @@ int main(int argc, char *argv[])
       sensor_msgs::JointStateConstPtr msg = joint_data.pop();
       std::vector<double> pos_vector = msg->position;
       double *pos_array = pos_vector.data();
-      jointNominalConfig = Eigen::Map<Eigen::Matrix<double, 23, 1>>(pos_array);
+      jointNominalConfig = Eigen::Map<Eigen::Matrix<double, 21, 1>>(pos_array);
 
       std::vector<double> vel_vector = msg->velocity;
       double *vel_array = vel_vector.data();
-      jointNominalVelocity = Eigen::Map<Eigen::Matrix<double, 22, 1>>(vel_array);
+      jointNominalVelocity = Eigen::Map<Eigen::Matrix<double, 20, 1>>(vel_array);
     }
     if (animation_mode)
     {
