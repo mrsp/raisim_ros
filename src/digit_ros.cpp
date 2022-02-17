@@ -171,11 +171,11 @@ int main(int argc, char *argv[])
 
   ///Set Nominal Configuration
   jointNominalConfig.setZero();
-  jointNominalConfig[2]=0.92;
+  jointNominalConfig[2]=0.9196;
   jointNominalConfig[3]=1;
 
-  jointNominalConfig[hip_abduction_left+7]=0.37;
-  jointNominalConfig[hip_abduction_right+7]=-0.37;
+  jointNominalConfig[hip_abduction_left+7]=0.375;
+  jointNominalConfig[hip_abduction_right+7]=-0.375;
   jointNominalConfig[hip_flexion_left+7]= 0.115;
   jointNominalConfig[hip_flexion_right+7]= -0.115;
   jointNominalConfig[shoulder_pitch_joint_left+7]=0.8;
