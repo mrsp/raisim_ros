@@ -210,8 +210,8 @@ int main(int argc, char *argv[])
   /// q, dq is the actual configuration from raisim
   Eigen::VectorXd q(digit->getGeneralizedCoordinateDim()), dq(digit->getDOF());
   /// Set Desired Frames for the WBC
-  string lfoot_frame = "left_toe_roll";
-  string rfoot_frame = "right_toe_roll";
+  string lfoot_frame = "left_sole";
+  string rfoot_frame = "right_sole";
   string base_frame = "torso";
   string lhand_frame = "left_elbow";
   string rhand_frame = "right_elbow";
@@ -223,11 +223,11 @@ int main(int argc, char *argv[])
   bool firstCoMVel = true;
 
   /// For Contact Detection, COP, GRF and GRT computation
-  auto RfootIndex = digit->getBodyIdx(rfoot_frame);
-  auto LfootIndex = digit->getBodyIdx(lfoot_frame);
+  auto RfootIndex = digit->getBodyIdx("toe_roll_joint_right");
+  auto LfootIndex = digit->getBodyIdx("toe_roll_joint_left");
 
-  auto RfootFrameIndex = digit->getFrameIdxByName("toe_roll_joint_right");
-  auto LfootFrameIndex = digit->getFrameIdxByName("toe_roll_joint_left");
+  auto RfootFrameIndex = digit->getFrameIdxByName("RLeg_effector_fixedjoint");
+  auto LfootFrameIndex = digit->getFrameIdxByName("LLeg_effector_fixedjoint");
   auto RHandFrameIndex = digit->getFrameIdxByName("elbow_joint_right");
   auto LHandFrameIndex = digit->getFrameIdxByName("elbow_joint_left");
   auto HeadFrameIndex = digit->getFrameIdxByName("hip_flexion_right");

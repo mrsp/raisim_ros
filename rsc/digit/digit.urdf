@@ -171,6 +171,15 @@
       </geometry>
     </collision>
   </link>
+  <joint name="LLeg_effector_fixedjoint" type="fixed">
+    <parent link="left_toe_roll"/>
+    <child link="left_sole"/>
+    <origin rpy="0 -1.046666667 -1.57079632679" xyz="0 0 -0.04511"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+  <link name="left_sole"/>
+
+
   <link name="left_shoulder_roll">
     <inertial>
       <origin rpy="0 0 0" xyz="9e-06 -0.003158 0.023405"/>
@@ -437,6 +446,14 @@
       </geometry>
     </collision>
   </link>
+  <joint name="RLeg_effector_fixedjoint" type="fixed">
+    <parent link="right_toe_roll"/>
+    <child link="right_sole"/>
+    <origin rpy="0 -1.046666667 1.57079632679" xyz="0 0 -0.04511"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+  <link name="right_sole"/>
+
   <link name="right_shoulder_roll">
     <inertial>
       <origin rpy="0 0 0" xyz="9e-06 0.003158 0.023405"/>
