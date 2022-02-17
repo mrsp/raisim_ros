@@ -20,17 +20,18 @@
 
 
 using namespace Eigen;
-//Simulation Step, 0.001 is the hardware loop of the actual digit
-double dt = 0.001;
+//Simulation Step, 0.0025 is the hardware loop of the actual digit
+double dt = 0.0025;
 double freq = 1.0 / dt;
 int micro_dt = dt * 1000000;
 
 enum JointDevices
 {
-  hip_abduction_left,
+  hip_abduction_left=0,
   hip_rotation_left,
   hip_flexion_left,
   knee_joint_left,
+  knee_to_shin_left,
   shin_to_tarsus_left,
   toe_pitch_joint_left,
   toe_roll_joint_left,
@@ -38,17 +39,22 @@ enum JointDevices
   shoulder_pitch_joint_left,
   shoulder_yaw_joint_left,
   elbow_joint_left,
+  shoulder_roll_cap_left,
   hip_abduction_right,
   hip_rotation_right,
   hip_flexion_right,
   knee_joint_right,
+  knee_to_shin_right,
   shin_to_tarsus_right,
   toe_pitch_joint_right,
   toe_roll_joint_right,
   shoulder_roll_joint_right,
   shoulder_pitch_joint_right,
   shoulder_yaw_joint_right,
-  elbow_joint_right
+  elbow_joint_right,
+  shoulder_cap_joint_right,
+  waist_cap_joint_right,
+  waist_cap_joint_left
 };
 
 
@@ -165,8 +171,18 @@ int main(int argc, char *argv[])
 
   ///Set Nominal Configuration
   jointNominalConfig.setZero();
-  jointNominalConfig << 0,0,1,1,0,0,0,
-  0.35,0,0,-0.1,0,0,0,0,0.8,0,0.5,-0.35,0,0,-0.1,0,0,0,0,-0.8,0,-0.5; 
+  jointNominalConfig[2]=0.92;
+  jointNominalConfig[3]=1;
+
+  jointNominalConfig[hip_abduction_left+7]=0.37;
+  jointNominalConfig[hip_abduction_right+7]=-0.37;
+  jointNominalConfig[hip_flexion_left+7]= 0.115;
+  jointNominalConfig[hip_flexion_right+7]= -0.115;
+  jointNominalConfig[shoulder_pitch_joint_left+7]=0.8;
+  jointNominalConfig[elbow_joint_left+7]=0.5;
+  jointNominalConfig[shoulder_pitch_joint_right+7]= -0.8;
+  jointNominalConfig[elbow_joint_right+7]= -0.5;
+
   jointNominalVelocity.setZero();
 
 
@@ -202,6 +218,7 @@ int main(int argc, char *argv[])
   string head_frame = "torso";
 
   double mass = digit->getTotalMass();
+  cout<<"Digit mass "<<mass<<endl;
   bool LSS, RSS, DS;
   bool firstCoMVel = true;
 
@@ -452,11 +469,11 @@ int main(int argc, char *argv[])
       sensor_msgs::JointStateConstPtr msg = joint_data.pop();
       std::vector<double> pos_vector = msg->position;
       double *pos_array = pos_vector.data();
-      jointNominalConfig = Eigen::Map<Eigen::Matrix<double, 29, 1>>(pos_array);
+      jointNominalConfig = Eigen::Map<Eigen::Matrix<double, 35, 1>>(pos_array);
 
       std::vector<double> vel_vector = msg->velocity;
       double *vel_array = vel_vector.data();
-      jointNominalVelocity = Eigen::Map<Eigen::Matrix<double, 28, 1>>(vel_array);
+      jointNominalVelocity = Eigen::Map<Eigen::Matrix<double, 34, 1>>(vel_array);
     }
     if (animation_mode)
     {

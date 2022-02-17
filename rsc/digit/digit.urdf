@@ -580,7 +580,7 @@
     <child link="left_knee"/>
     <limit effort="12.5" lower="-1.2392" upper="0.8727" velocity="8.5085"/>
   </joint>
-  <joint name="knee_to_shin_left" type="fixed">
+  <joint name="knee_to_shin_left" type="revolute">
     <origin rpy="0 0 0" xyz="0.060677 0.047406 0"/>
     <axis xyz="0 0 1"/>
     <parent link="left_knee"/>
@@ -615,7 +615,7 @@
     <child link="left_shoulder_roll"/>
     <limit effort="1.4" lower="-1.309" upper="1.309" velocity="12.5"/>
   </joint>
-  <joint name="shoulder_roll_cap_left" type="fixed">
+  <joint name="shoulder_roll_cap_left" type="revolute">
     <origin rpy="-1.57079632679 -1.3962633 1.57079632679" xyz="0.001 0.12 0.4"/>
     <axis xyz="0 0 1"/>
     <parent link="torso"/>
@@ -671,7 +671,7 @@
     <child link="right_knee"/>
     <limit effort="12.5" lower="-0.8727" upper="1.2392" velocity="8.5085"/>
   </joint>
-  <joint name="knee_to_shin_right" type="fixed">
+  <joint name="knee_to_shin_right" type="revolute">
     <origin rpy="0 0 0" xyz="0.060677 -0.047406 0"/>
     <axis xyz="0 0 1"/>
     <parent link="right_knee"/>
@@ -706,7 +706,7 @@
     <child link="right_shoulder_roll"/>
     <limit effort="1.4" lower="-1.309" upper="1.309" velocity="12.5"/>
   </joint>
-  <joint name="shoulder_cap_joint_right" type="fixed">
+  <joint name="shoulder_cap_joint_right" type="revolute">
     <origin rpy="1.57079632679 -1.3962633 -1.57079632679" xyz="0.001 -0.12 0.4"/>
     <axis xyz="0 0 1"/>
     <parent link="torso"/>
@@ -714,7 +714,7 @@
     <limit effort="1.4" lower="-1.309" upper="1.309" velocity="12.5"/>
   </joint>
 
-  <joint name="waist_cap_joint_right" type="fixed">
+  <joint name="waist_cap_joint_right" type="revolute">
     <origin rpy="1.57079632679 1.57 -1.57079632679" xyz="-0.001 -0.09 0.0"/>
     <axis xyz="0 0 1"/>
     <parent link="torso"/>
@@ -722,7 +722,7 @@
     <limit effort="1.4" lower="-1.309" upper="1.309" velocity="12.5"/>
   </joint>
 
-  <joint name="waist_cap_joint_left" type="fixed">
+  <joint name="waist_cap_joint_left" type="revolute">
     <origin rpy="-1.57079632679 1.57 1.57079632679" xyz="-0.001 0.09 0.0"/>
     <axis xyz="0 0 1"/>
     <parent link="torso"/>
