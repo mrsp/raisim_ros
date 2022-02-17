@@ -27,35 +27,28 @@ int micro_dt = dt * 1000000;
 
 enum JointDevices
 {
-  back_bkz = 0,
-  back_bky,
-  back_bkx,
-  l_arm_shz,
-  l_arm_shx,
-  l_arm_ely,
-  l_arm_elx,
-  l_arm_wry,
-  l_arm_wrx,
-  l_arm_wry2,
-  r_arm_shz,
-  r_arm_shx,
-  r_arm_ely,
-  r_arm_elx,
-  r_arm_wry,
-  r_arm_wrx,
-  r_arm_wry2,
-  l_leg_hpz,
-  l_leg_hpx,
-  l_leg_hpy,
-  l_leg_kny,
-  l_leg_aky,
-  l_leg_akx,
-  r_leg_hpz,
-  r_leg_hpx,
-  r_leg_hpy,
-  r_leg_kny,
-  r_leg_aky,
-  r_leg_akx
+  hip_abduction_left,
+  hip_rotation_left,
+  hip_flexion_left,
+  knee_joint_left,
+  shin_to_tarsus_left,
+  toe_pitch_joint_left,
+  toe_roll_joint_left,
+  shoulder_roll_joint_left,
+  shoulder_pitch_joint_left,
+  shoulder_yaw_joint_left,
+  elbow_joint_left,
+  hip_abduction_right,
+  hip_rotation_right,
+  hip_flexion_right,
+  knee_joint_right,
+  shin_to_tarsus_right,
+  toe_pitch_joint_right,
+  toe_roll_joint_right,
+  shoulder_roll_joint_right,
+  shoulder_pitch_joint_right,
+  shoulder_yaw_joint_right,
+  elbow_joint_right
 };
 
 
@@ -172,11 +165,10 @@ int main(int argc, char *argv[])
 
   ///Set Nominal Configuration
   jointNominalConfig.setZero();
+  jointNominalConfig << 0,0,1,1,0,0,0,
+  0.35,0,0,-0.1,0,0,0,0,0.8,0,0.5,-0.35,0,0,-0.1,0,0,0,0,-0.8,0,-0.5; 
   jointNominalVelocity.setZero();
-  jointNominalConfig[0] = 0;
-  jointNominalConfig[1] = 0;
-  jointNominalConfig[2] = 1;
-  jointNominalConfig[3] = 1;
+
 
   ///Set Joint PD Gains
   Eigen::VectorXd jointPgain(digit->getDOF()), jointDgain(digit->getDOF());

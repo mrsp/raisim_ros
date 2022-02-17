@@ -1,6 +1,6 @@
 modelname: "../rsc/morphLynX/morphLynX.urdf"
 activation_key: "../share/raisim/activation.raisim"
 enable_gravity: True
-animation_mode: False
+animation_mode: True
 jointPgain: 150.0
 jointDgain: 10.0
