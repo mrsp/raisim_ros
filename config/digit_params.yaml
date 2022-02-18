@@ -2,5 +2,7 @@ modelname: "../rsc/digit/digit.urdf"
 activation_key: "../share/raisim/activation.raisim"
 enable_gravity: True
 animation_mode: False
-jointPgain: 100000000000000.0
-jointDgain: 10000000000000.0
+jointPgain: 1000000000.0
+jointDgain: 1000000000.0
+#jointPgain: 450.0
+#jointDgain: 2.0

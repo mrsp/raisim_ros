@@ -71,11 +71,10 @@ Eigen::MatrixXd parseCSV(string filename, int data_dim)
   return data;
 }
 
-Eigen::VectorXd PDControl(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd dq, Eigen::VectorXd dqd, Eigen::MatrixXd P, Eigen::MatrixXd D)
+Eigen::VectorXd PDControl(const Eigen::VectorXd &q, const Eigen::VectorXd &qd, const Eigen::VectorXd &dq, const Eigen::VectorXd &dqd, const Eigen::MatrixXd &P, const Eigen::MatrixXd &D)
 {
   Eigen::VectorXd tau;
   tau.setZero(q.size());
-  
   tau = P*(qd-q) + D*(dqd-dq); 
   return tau;
 }

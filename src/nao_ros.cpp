@@ -441,7 +441,7 @@ int main(int argc, char *argv[])
     else
     {
       NAO->setPdTarget(jointNominalConfig, jointNominalVelocity);
-      VectorXd tau;
+      //VectorXd tau;
       // tau.setZero(NAO->getDOF());
       // tau.tail(NAO->getDOF()-6) = PDControl(q.tail(NAO->getGeneralizedCoordinateDim()-7), jointNominalConfig.tail(NAO->getGeneralizedCoordinateDim()-7), 
       // dq.tail(NAO->getDOF()-6), jointNominalVelocity.tail(NAO->getDOF()-6), jointPgain.tail(NAO->getDOF()-6).asDiagonal(), jointDgain.tail(NAO->getDOF()-6).asDiagonal());

@@ -186,18 +186,20 @@ int main(int argc, char *argv[])
   jointNominalVelocity.setZero();
 
 
-  ///Set Joint PD Gains
-  Eigen::VectorXd jointPgain(digit->getDOF()), jointDgain(digit->getDOF());
-  jointPgain.setConstant(jointPgain_);
-  jointDgain.setConstant(jointDgain_); 
-
 
   ///Set the Initial Configuration in the world
   digit->setGeneralizedCoordinate(jointNominalConfig);
   digit->setGeneralizedVelocity(jointNominalVelocity);
   digit->setGeneralizedForce(Eigen::VectorXd::Zero(digit->getDOF()));
-  digit->setPdGains(jointPgain, jointDgain);
   digit->setName("digit");
+
+
+  ///Set Joint PD Gains
+  Eigen::VectorXd jointPgain(digit->getDOF()), jointDgain(digit->getDOF());
+  jointPgain.setConstant(jointPgain_);
+  jointDgain.setConstant(jointDgain_); 
+  //digit->setControlMode(raisim::ControlMode::FORCE_AND_TORQUE);
+  digit->setPdGains(jointPgain, jointDgain);
 
   digit->printOutBodyNamesInOrder();
   digit->printOutFrameNamesInOrder();
@@ -481,10 +483,16 @@ int main(int argc, char *argv[])
       digit->setGeneralizedVelocity(jointNominalVelocity);
     }
     else
+    {
       digit->setPdTarget(jointNominalConfig, jointNominalVelocity);
+      // VectorXd tau;
+      // tau.setZero(digit->getDOF());
+      // tau.tail(digit->getDOF()-6) = PDControl(q.tail(digit->getGeneralizedCoordinateDim()-7), jointNominalConfig.tail(digit->getGeneralizedCoordinateDim()-7), 
+      // dq.tail(digit->getDOF()-6), jointNominalVelocity.tail(digit->getDOF()-6), jointPgain.tail(digit->getDOF()-6).asDiagonal(), jointDgain.tail(digit->getDOF()-6).asDiagonal());
+      // cout<<"Joint Torque "<<tau.transpose()<<" "<<tau.size()<<endl;
+      // digit->setGeneralizedForce(tau);
 
-
-
+    }
     if(!initialized)
     {
       initialized = true;
