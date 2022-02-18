@@ -20,7 +20,7 @@
 
 
 using namespace Eigen;
-//Simulation Step, 0.0025 is the hardware loop of the actual digit
+//Simulation Step, 0.001 is the hardware loop of the actual digit
 double dt = 0.0025;
 double freq = 1.0 / dt;
 int micro_dt = dt * 1000000;
@@ -31,7 +31,7 @@ enum JointDevices
   hip_rotation_left,
   hip_flexion_left,
   knee_joint_left,
-  knee_to_shin_left,
+  //knee_to_shin_left,
   shin_to_tarsus_left,
   toe_pitch_joint_left,
   toe_roll_joint_left,
@@ -39,22 +39,22 @@ enum JointDevices
   shoulder_pitch_joint_left,
   shoulder_yaw_joint_left,
   elbow_joint_left,
-  shoulder_roll_cap_left,
+  //shoulder_roll_cap_left,
   hip_abduction_right,
   hip_rotation_right,
   hip_flexion_right,
   knee_joint_right,
-  knee_to_shin_right,
+  //knee_to_shin_right,
   shin_to_tarsus_right,
   toe_pitch_joint_right,
   toe_roll_joint_right,
   shoulder_roll_joint_right,
   shoulder_pitch_joint_right,
   shoulder_yaw_joint_right,
-  elbow_joint_right,
-  shoulder_cap_joint_right,
-  waist_cap_joint_right,
-  waist_cap_joint_left
+  elbow_joint_right
+  //shoulder_cap_joint_right,
+  //waist_cap_joint_right,
+  //waist_cap_joint_left
 };
 
 
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
   jointNominalConfig[elbow_joint_left+7]=0.5;
   jointNominalConfig[shoulder_pitch_joint_right+7]= -0.8;
   jointNominalConfig[elbow_joint_right+7]= -0.5;
-
+  cout<<"Joint Nominal "<<jointNominalConfig.transpose()<<endl;
   jointNominalVelocity.setZero();
 
 
@@ -196,10 +196,36 @@ int main(int argc, char *argv[])
 
   ///Set Joint PD Gains
   Eigen::VectorXd jointPgain(digit->getDOF()), jointDgain(digit->getDOF());
-  jointPgain.setConstant(jointPgain_);
-  jointDgain.setConstant(jointDgain_); 
+  jointPgain.setZero();
+  jointDgain.setZero();
+
+  jointPgain.tail(digit->getDOF()-6).setConstant(jointPgain_);
+  jointDgain.tail(digit->getDOF()-6).setConstant(jointDgain_); 
+
+  double valueP = 1000.0;
+  double valueD = 1.0;
+  jointPgain[hip_abduction_left+7]=valueP;
+  jointPgain[hip_abduction_right+7]=valueP;
+  jointPgain[hip_flexion_left+7]= valueP;
+  jointPgain[hip_flexion_right+7]= valueP;
+  jointPgain[toe_pitch_joint_left+7]= valueP;
+  jointPgain[toe_roll_joint_left+7]= valueP;
+  jointPgain[toe_pitch_joint_right+7]= valueP;
+  jointPgain[toe_roll_joint_right+7]= valueP;
+
+
+  jointDgain[hip_abduction_left+7]= valueD;
+  jointDgain[hip_abduction_right+7]= valueD;
+  jointDgain[hip_flexion_left+7]= valueD;
+  jointDgain[hip_flexion_right+7]= valueD;
+  jointPgain[toe_pitch_joint_left+7]= valueD;
+  jointPgain[toe_roll_joint_left+7]= valueD;
+  jointPgain[toe_pitch_joint_right+7]= valueD;
+  jointPgain[toe_roll_joint_right+7]= valueD;
+
+
   //digit->setControlMode(raisim::ControlMode::FORCE_AND_TORQUE);
-  digit->setPdGains(jointPgain, jointDgain);
+  // digit->setPdGains(jointPgain, jointDgain);
 
   digit->printOutBodyNamesInOrder();
   digit->printOutFrameNamesInOrder();
@@ -225,8 +251,8 @@ int main(int argc, char *argv[])
   bool firstCoMVel = true;
 
   /// For Contact Detection, COP, GRF and GRT computation
-  auto RfootIndex = digit->getBodyIdx("toe_roll_joint_right");
-  auto LfootIndex = digit->getBodyIdx("toe_roll_joint_left");
+  auto RfootIndex = digit->getBodyIdx("right_toe_roll");
+  auto LfootIndex = digit->getBodyIdx("left_toe_roll");
 
   auto RfootFrameIndex = digit->getFrameIdxByName("RLeg_effector_fixedjoint");
   auto LfootFrameIndex = digit->getFrameIdxByName("LLeg_effector_fixedjoint");
@@ -471,11 +497,11 @@ int main(int argc, char *argv[])
       sensor_msgs::JointStateConstPtr msg = joint_data.pop();
       std::vector<double> pos_vector = msg->position;
       double *pos_array = pos_vector.data();
-      jointNominalConfig = Eigen::Map<Eigen::Matrix<double, 35, 1>>(pos_array);
+      jointNominalConfig = Eigen::Map<Eigen::Matrix<double, 29, 1>>(pos_array);
 
       std::vector<double> vel_vector = msg->velocity;
       double *vel_array = vel_vector.data();
-      jointNominalVelocity = Eigen::Map<Eigen::Matrix<double, 34, 1>>(vel_array);
+      jointNominalVelocity = Eigen::Map<Eigen::Matrix<double, 28, 1>>(vel_array);
     }
     if (animation_mode)
     {
@@ -484,13 +510,13 @@ int main(int argc, char *argv[])
     }
     else
     {
-      digit->setPdTarget(jointNominalConfig, jointNominalVelocity);
-      // VectorXd tau;
-      // tau.setZero(digit->getDOF());
-      // tau.tail(digit->getDOF()-6) = PDControl(q.tail(digit->getGeneralizedCoordinateDim()-7), jointNominalConfig.tail(digit->getGeneralizedCoordinateDim()-7), 
-      // dq.tail(digit->getDOF()-6), jointNominalVelocity.tail(digit->getDOF()-6), jointPgain.tail(digit->getDOF()-6).asDiagonal(), jointDgain.tail(digit->getDOF()-6).asDiagonal());
+      // digit->setPdTarget(jointNominalConfig, jointNominalVelocity);
+      VectorXd tau;
+      tau.setZero(digit->getDOF());
+      tau.tail(digit->getDOF()-6) = PDControl(q.tail(digit->getGeneralizedCoordinateDim()-7), jointNominalConfig.tail(digit->getGeneralizedCoordinateDim()-7), 
+      dq.tail(digit->getDOF()-6), jointNominalVelocity.tail(digit->getDOF()-6), jointPgain.tail(digit->getDOF()-6).asDiagonal(), jointDgain.tail(digit->getDOF()-6).asDiagonal());
       // cout<<"Joint Torque "<<tau.transpose()<<" "<<tau.size()<<endl;
-      // digit->setGeneralizedForce(tau);
+      digit->setGeneralizedForce(tau);
 
     }
     if(!initialized)
