@@ -111,7 +111,6 @@ int main(int argc, char *argv[])
   n_p.param<bool>("enable_gravity",enable_gravity,true);
   n_p.param<bool>("animation_mode",animation_mode,false);
   n_p.param<double>("jointPgain", jointPgain_, 350);
-  n_p.param<double>("jointDgain", jointDgain_, 5);
   //If we received a path lets do the conversion..
   if (path!=0)
     {
@@ -200,32 +199,30 @@ int main(int argc, char *argv[])
   jointDgain.setZero();
 
   jointPgain.tail(digit->getDOF()-6).setConstant(jointPgain_);
+  n_p.param<double>("jointDgain", jointDgain_, 5);
   jointDgain.tail(digit->getDOF()-6).setConstant(jointDgain_); 
+  // double valueP;
+  // jointPgain[hip_abduction_left+7]=valueP;
+  // jointPgain[hip_abduction_right+7]=valueP;
+  // jointPgain[hip_rotation_left +7] = valueP;
+  // jointPgain[hip_rotation_right +7] = valueP;
+  // jointPgain[knee_joint_left +7] = valueP;
+  // jointPgain[knee_joint_right +7] = valueP;
 
-  double valueP = 1000.0;
-  double valueD = 1.0;
-  jointPgain[hip_abduction_left+7]=valueP;
-  jointPgain[hip_abduction_right+7]=valueP;
-  jointPgain[hip_flexion_left+7]= valueP;
-  jointPgain[hip_flexion_right+7]= valueP;
-  jointPgain[toe_pitch_joint_left+7]= valueP;
-  jointPgain[toe_roll_joint_left+7]= valueP;
-  jointPgain[toe_pitch_joint_right+7]= valueP;
-  jointPgain[toe_roll_joint_right+7]= valueP;
+  // jointPgain[hip_flexion_left+7]= valueP;
+  // jointPgain[hip_flexion_right+7]= valueP;
+  // jointPgain[toe_pitch_joint_left+7]= valueP;
+  // jointPgain[toe_roll_joint_left+7]= valueP;
+  // jointPgain[toe_pitch_joint_right+7]= valueP;
+  // jointPgain[toe_roll_joint_right+7]= valueP;
+
+  // jointDgain.tail(digit->getDOF()-6).setConstant(2*sqrt(jointPgain_)); 
 
 
-  jointDgain[hip_abduction_left+7]= valueD;
-  jointDgain[hip_abduction_right+7]= valueD;
-  jointDgain[hip_flexion_left+7]= valueD;
-  jointDgain[hip_flexion_right+7]= valueD;
-  jointPgain[toe_pitch_joint_left+7]= valueD;
-  jointPgain[toe_roll_joint_left+7]= valueD;
-  jointPgain[toe_pitch_joint_right+7]= valueD;
-  jointPgain[toe_roll_joint_right+7]= valueD;
 
 
   //digit->setControlMode(raisim::ControlMode::FORCE_AND_TORQUE);
-  // digit->setPdGains(jointPgain, jointDgain);
+  digit->setPdGains(jointPgain, jointDgain);
 
   digit->printOutBodyNamesInOrder();
   digit->printOutFrameNamesInOrder();
@@ -510,14 +507,14 @@ int main(int argc, char *argv[])
     }
     else
     {
-      // digit->setPdTarget(jointNominalConfig, jointNominalVelocity);
-      VectorXd tau;
-      tau.setZero(digit->getDOF());
-      tau.tail(digit->getDOF()-6) = PDControl(q.tail(digit->getGeneralizedCoordinateDim()-7), jointNominalConfig.tail(digit->getGeneralizedCoordinateDim()-7), 
-      dq.tail(digit->getDOF()-6), jointNominalVelocity.tail(digit->getDOF()-6), jointPgain.tail(digit->getDOF()-6).asDiagonal(), jointDgain.tail(digit->getDOF()-6).asDiagonal());
-      // cout<<"Joint Torque "<<tau.transpose()<<" "<<tau.size()<<endl;
-      digit->setGeneralizedForce(tau);
-
+      digit->setPdTarget(jointNominalConfig, jointNominalVelocity);
+      // VectorXd tau;
+      // tau.setZero(digit->getDOF());
+      
+      // tau.tail(digit->getDOF()-6) = PDControl(q.tail(digit->getDOF()-6), jointNominalConfig.tail(digit->getDOF()-6), 
+      // dq.tail(digit->getDOF()-6), jointNominalVelocity.tail(digit->getDOF()-6), digit->getMassMatrix().e().bottomRows(digit->getDOF()-6), digit->getNonlinearities(world.getGravity()).e().tail(digit->getDOF()-6),
+      //  jointPgain.tail(digit->getDOF()-6).asDiagonal(), jointDgain.tail(digit->getDOF()-6).asDiagonal());
+      // digit->setGeneralizedForce(tau);
     }
     if(!initialized)
     {

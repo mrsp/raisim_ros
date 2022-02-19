@@ -74,8 +74,17 @@ Eigen::MatrixXd parseCSV(string filename, int data_dim)
 Eigen::VectorXd PDControl(const Eigen::VectorXd &q, const Eigen::VectorXd &qd, const Eigen::VectorXd &dq, const Eigen::VectorXd &dqd, const Eigen::MatrixXd &P, const Eigen::MatrixXd &D)
 {
   Eigen::VectorXd tau;
-  tau.setZero(q.size());
+  tau.setZero(dq.size());
   tau = P*(qd-q) + D*(dqd-dq); 
+
+  return tau;
+}
+
+Eigen::VectorXd PDControl(const Eigen::VectorXd &q, const Eigen::VectorXd &qd, const Eigen::VectorXd &dq, const Eigen::VectorXd &dqd,  Eigen::MatrixXd M,  Eigen::VectorXd h, const Eigen::MatrixXd &P, const Eigen::MatrixXd &D)
+{
+  Eigen::VectorXd tau;
+  tau.setZero(dq.size());
+  tau = M*(P*(qd-q) + D*(dqd-dq))+h;
   return tau;
 }
 
