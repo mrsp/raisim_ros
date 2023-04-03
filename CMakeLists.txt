@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(raisim_ros)
 
-
-list(APPEND CMAKE_PREFIX_PATH /home/michael/raisim_build)
+set(ENV_VAR $ENV{WORKSPACE}) # WORKSPACE shell variables is set by the Raisim Tutorial (/home/<usrname>)
+list(APPEND CMAKE_PREFIX_PATH ${ENV_VAR}/raisim) # Change raisim to the name of the folder where raisim is built
 
 
 ## Compile as C++11, supported in ROS Kinetic and newer
